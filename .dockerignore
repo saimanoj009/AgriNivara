@@ -1,19 +1,50 @@
+# ============================================================
+# AgriNivara Docker Ignore
+# ============================================================
+
+# Git
 .git
 .git/**
+.github
+
+# Python cache
 **/__pycache__
 **/*.pyc
-**/.pytest_cache
+**/*.pyo
+**/*.pyd
 
+# Python environments
+**/venv
+**/.venv
+
+# Testing
+**/.pytest_cache
+**/.coverage
+**/htmlcov
+
+# Node
 frontend/node_modules
 frontend/dist
 
-backend/venv
-backend/.venv
-
+# Logs
 *.log
 
-README_SIH_FINAL.md
-
+# Local data
 backend/data
+
+# Training scripts
 backend/model/train_model.py
 backend/disease/train_model.py
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE / OS
+.vscode
+.idea
+.DS_Store
+
+# Documentation not required in image
+README_SIH_FINAL.md
