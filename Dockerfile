@@ -19,10 +19,18 @@ RUN npm run build
 FROM python:3.11-slim AS runtime
 
 WORKDIR /app
-
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PORT=7860
+
+# -------------------- GIT LFS --------------------
+# Required so that Git LFS-tracked files (e.g. plant_disease_model.keras)
+# are resolved to their actual binary content instead of being left as
+# 134-byte pointer files when the build context is checked out from git.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends git git-lfs && \
+    git lfs install && \
+    rm -rf /var/lib/apt/lists/*
 
 # -------------------- PYTHON DEPENDENCIES --------------------
 COPY backend/requirements.txt ./backend/requirements.txt
