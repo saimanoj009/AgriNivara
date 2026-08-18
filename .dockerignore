@@ -1,0 +1,14 @@
+.git
+.git/**
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+frontend/node_modules
+frontend/dist
+backend/venv
+backend/.venv
+*.log
+README_SIH_FINAL.md
+backend/data
+backend/model/train_model.py
+backend/disease/train_model.py

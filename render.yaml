@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: agrinivara
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: AGRINIVARA_AUTH_SECRET
+        generateValue: true
+      - key: PORT
+        value: 10000
