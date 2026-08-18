@@ -59,6 +59,21 @@ uvicorn main:app --reload
 API documentation:
 
 http://localhost:8000/docs
+
+📦 Git LFS (Large Model File)
+
+backend/model/plant_disease_model.keras (~134 MB) is tracked with Git LFS. Cloning or pulling this repository without Git LFS installed will leave you with a small pointer file instead of the real model, and /predict-disease will fail with HTTP 503 ("File not found") when the backend tries to load it.
+
+If you cloned before installing Git LFS, or if git lfs ls-files shows the model as missing/pointer-only, fix it locally with:
+
+git lfs install
+git lfs track "*.keras"
+git add .gitattributes
+git add backend/model/plant_disease_model.keras
+git commit -m "fix: add plant disease model via Git LFS"
+git push origin main
+
+After installing Git LFS (git lfs install), a normal git clone/git pull will automatically resolve the pointer into the real binary. Deploys (e.g. on Railway) must also fetch LFS objects during the build — verify the model file size in the deploy logs matches ~134 MB rather than the ~130 byte pointer.
 🔌 Main API Endpoints
 GET  /health
 POST /predict-crop
