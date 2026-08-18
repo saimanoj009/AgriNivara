@@ -29,8 +29,11 @@ function Login() {
 
         setLoading(true);
         try {
+            // ✅ Calls /auth/login via loginApi
             const auth = await loginApi(value, password);
             saveAuthSession(auth);
+
+            // Redirect based on role
             navigate(auth.role === "admin" ? "/admin" : "/dashboard", { replace: true });
         } catch (err: any) {
             setError(err.message || "Login failed. Please check your credentials.");
