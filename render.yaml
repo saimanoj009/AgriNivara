@@ -1,12 +1,10 @@
 services:
   - type: web
     name: agrinivara
-    runtime: docker
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
-    healthCheckPath: /health
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    plan: free
     envVars:
-      - key: AGRINIVARA_AUTH_SECRET
-        generateValue: true
       - key: PORT
-        value: 10000
+        value: 5000
