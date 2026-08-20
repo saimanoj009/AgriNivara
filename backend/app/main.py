@@ -2507,9 +2507,10 @@ def admin_stats(
 
 @app.get("/")
 def home():
-
-    if FRONTEND_DIST.exists() and (FRONTEND_DIST / "index.html").exists():
-        return FileResponse(FRONTEND_DIST / "index.html")
+    index_file = FRONTEND_DIST / "index.html"
+    print(f"Checking FRONTEND_DIST index.html: {index_file} (exists={index_file.exists()})")
+    if index_file.exists():
+        return FileResponse(index_file)
 
     return {
         "message": (
