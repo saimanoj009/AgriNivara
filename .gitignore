@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.log
+
+# Node
+node_modules/
+dist/
+
+# Local database
+backend/*.db
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+.vscode/
