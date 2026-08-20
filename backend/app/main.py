@@ -367,7 +367,8 @@ class DiseaseModelLoader:
         }
 
 
-PLANT_MODEL_URL = os.getenv("PLANT_DISEASE_MODEL_URL", os.getenv("MODEL_URL", ""))
+DEFAULT_PLANT_MODEL_URL = "https://media.githubusercontent.com/media/saimanoj009/AgriNivara/main/backend/model/plant_disease_model.keras"
+PLANT_MODEL_URL = os.getenv("PLANT_DISEASE_MODEL_URL", os.getenv("MODEL_URL", DEFAULT_PLANT_MODEL_URL))
 
 # Single loader instance used by the API.
 disease_model_loader = DiseaseModelLoader(PLANT_MODEL_PATH, PLANT_MODEL_URL)
