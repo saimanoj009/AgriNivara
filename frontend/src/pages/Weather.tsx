@@ -4,19 +4,15 @@ import {
   ArrowLeft,
   CloudSun,
   MapPin,
-  Search,
   Loader2,
   Droplets,
   Wind,
-  ThermometerSun,
   AlertTriangle,
   CheckCircle2,
   Sparkles,
   Calendar,
-  Layers,
-  ChevronRight,
-  Info,
 } from 'lucide-react';
+
 import {
   fetchRealtimeWeatherApi,
   searchLocationApi,
@@ -179,9 +175,10 @@ export default function Weather() {
           </p>
         </div>
 
-        {/* SEARCH BAR & DISTRICT PRESETS */}
         <div className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 space-y-4">
-          <form onSubmit={handleManualSearch} className="relative max-w-2xl mx-auto" ref={suggestionRef}>
+          <div className="relative max-w-2xl mx-auto" ref={suggestionRef}>
+            <form onSubmit={handleManualSearch}>
+
             <div className="relative flex items-center">
               <MapPin className="w-5 h-5 text-emerald-400 absolute left-4" />
               <input
@@ -217,6 +214,10 @@ export default function Weather() {
               </div>
             )}
           </form>
+          </div>
+
+
+
 
           {/* Quick Region Buttons */}
           <div className="flex flex-wrap items-center justify-center gap-2 pt-2 border-t border-slate-800/80 text-xs">

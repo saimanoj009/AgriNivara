@@ -118,7 +118,11 @@ export function TechnicalDetailsModal({ isOpen, onClose, specs }: TechnicalDetai
                 </div>
 
                 {/* FOOTER */}
-                <div className="flex justify-end pt-2">
+                <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
+                    <div className="text-[11px] font-mono text-slate-500 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>AgriNivara Production v2.6.0 (Build 9a70baf)</span>
+                    </div>
                     <button
                         onClick={onClose}
                         className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition cursor-pointer"
@@ -126,6 +130,7 @@ export function TechnicalDetailsModal({ isOpen, onClose, specs }: TechnicalDetai
                         Close Specifications
                     </button>
                 </div>
+
 
             </div>
         </div>

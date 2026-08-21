@@ -3396,9 +3396,10 @@ def technical_details():
 
         "version": "2.6.0",
 
-        "sih_presentation_ready":
-            True
+        "platform_status":
+            "Production Enterprise Ready"
     }
+
 
 
 # ============================================================

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  ShieldCheck,
   Users,
   Activity,
   LogOut,
@@ -13,11 +12,13 @@ import {
   Search,
   CheckCircle2,
   AlertTriangle,
-  Clock,
   Loader2,
   RefreshCw,
   BarChart3,
+  MapPin,
+  Filter,
 } from 'lucide-react';
+
 
 import {
   fetchAdminStatsApi,
@@ -209,9 +210,10 @@ export default function AdminDashboard() {
             <span className="text-xs text-slate-400">System Status:</span>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[11px] font-black border border-emerald-500/20">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-              All Services Operational
+              Operational • v2.6.0 (9a70baf)
             </span>
           </div>
+
         </div>
 
         {error && (
@@ -816,9 +818,12 @@ function MetricCard({
         <b className="text-2xl sm:text-3xl font-black text-white mt-0.5 block">
           {typeof value === 'number' ? <AnimatedCounter value={value} /> : value}
         </b>
-        <span className={`text-[10px] font-bold mt-1 block ${highlight ? 'text-amber-400' : 'text-emerald-400'}`}>
+        <span className={`text-[10px] font-bold mt-1 block ${
+          highlight ? 'text-amber-400' : isPositive ? 'text-emerald-400' : 'text-slate-400'
+        }`}>
           {trend}
         </span>
+
       </div>
     </div>
   );
