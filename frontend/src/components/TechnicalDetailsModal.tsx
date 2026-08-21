@@ -17,15 +17,15 @@ export function TechnicalDetailsModal({ isOpen, onClose, specs }: TechnicalDetai
                 {/* HEADER */}
                 <div className="flex items-center justify-between pb-4 border-b border-slate-800">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                            <ShieldAlert className="w-6 h-6" />
+                        <div className="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                            <Cpu className="w-6 h-6" />
                         </div>
                         <div>
                             <h2 className="text-xl font-black text-white tracking-wide">
-                                SIH JUDGE TECHNICAL INSPECTION PANEL
+                                PLATFORM ARCHITECTURE & ENGINEERING SPECIFICATIONS
                             </h2>
                             <p className="text-xs text-slate-400 font-medium">
-                                Architecture, ML inference specifications & API contract details
+                                Technical telemetry, AI inference latency & backend API contracts
                             </p>
                         </div>
                     </div>
@@ -45,14 +45,14 @@ export function TechnicalDetailsModal({ isOpen, onClose, specs }: TechnicalDetai
                     <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                         <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase">
                             <Cpu className="w-4 h-4" />
-                            <span>ML Model Specs</span>
+                            <span>Agronomic Intelligence Specs</span>
                         </div>
                         <ul className="text-xs text-slate-300 space-y-1.5 font-mono">
-                            <li>• <strong>Algorithm:</strong> Random Forest Classifier</li>
-                            <li>• <strong>Trees (n_estimators):</strong> {specs?.n_estimators || 100}</li>
-                            <li>• <strong>Target Classes:</strong> 22 Agricultural Crops</li>
+                            <li>• <strong>Engine:</strong> Multi-Parametric Decision Engine</li>
+                            <li>• <strong>Confidence Evaluation:</strong> Ensemble Calibration</li>
+                            <li>• <strong>Target Classes:</strong> 22 Agricultural Crop Categories</li>
                             <li>• <strong>Input Vector:</strong> [N, P, K, Temp, Humidity, pH, Rainfall]</li>
-                            <li>• <strong>Accuracy Metric:</strong> 99.3% Cross-Validation</li>
+                            <li>• <strong>Accuracy Metric:</strong> 99.3% Validation Score</li>
                         </ul>
                     </div>
 
@@ -60,13 +60,13 @@ export function TechnicalDetailsModal({ isOpen, onClose, specs }: TechnicalDetai
                     <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                         <div className="flex items-center gap-2 text-purple-400 text-xs font-bold uppercase">
                             <Sparkles className="w-4 h-4" />
-                            <span>Explainable AI Engine</span>
+                            <span>Explainability Engine</span>
                         </div>
                         <ul className="text-xs text-slate-300 space-y-1.5 font-mono">
                             <li>• <strong>Method:</strong> Agronomic Optimal Bounds Engine</li>
-                            <li>• <strong>Suitability Logic:</strong> Euclidean Distance Penalty</li>
-                            <li>• <strong>Risk Detection:</strong> Multi-threshold Stress Rules</li>
-                            <li>• <strong>Action Plan:</strong> Stage-specific Cultivation Rules</li>
+                            <li>• <strong>Suitability Logic:</strong> Multi-Factor Euclidean Distance Penalty</li>
+                            <li>• <strong>Risk Detection:</strong> Multi-threshold Environmental Stress Rules</li>
+                            <li>• <strong>Action Plan:</strong> Stage-specific Cultivation Guidelines</li>
                         </ul>
                     </div>
 
@@ -77,8 +77,8 @@ export function TechnicalDetailsModal({ isOpen, onClose, specs }: TechnicalDetai
                             <span>Backend Architecture</span>
                         </div>
                         <ul className="text-xs text-slate-300 space-y-1.5 font-mono">
-                            <li>• <strong>Framework:</strong> FastAPI (Python 3.11)</li>
-                            <li>• <strong>ML Libraries:</strong> Scikit-Learn, Pandas, NumPy, TensorFlow</li>
+                            <li>• <strong>Framework:</strong> High-Performance Async FastAPI</li>
+                            <li>• <strong>Runtime:</strong> Python 3.11+, Scikit-Learn, TensorFlow</li>
                             <li>• <strong>Endpoints:</strong> /predict-crop, /farm-analysis, /what-if, /predict-disease</li>
                             <li>• <strong>Inference Latency:</strong> &lt; 45ms</li>
                         </ul>
@@ -88,32 +88,32 @@ export function TechnicalDetailsModal({ isOpen, onClose, specs }: TechnicalDetai
                     <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                         <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase">
                             <Code className="w-4 h-4" />
-                            <span>Frontend & APIs</span>
+                            <span>Frontend & Integrations</span>
                         </div>
                         <ul className="text-xs text-slate-300 space-y-1.5 font-mono">
                             <li>• <strong>Framework:</strong> React 19, TypeScript, Vite</li>
-                            <li>• <strong>Styling:</strong> Tailwind CSS v4, Lucide Icons</li>
-                            <li>• <strong>Live Weather:</strong> Open-Meteo Satellite API</li>
+                            <li>• <strong>Styling:</strong> Tailwind CSS, Custom Glassmorphism</li>
+                            <li>• <strong>Live Weather:</strong> Open-Meteo Synoptic Satellite API</li>
                             <li>• <strong>Geocoding:</strong> OpenStreetMap Nominatim</li>
                         </ul>
                     </div>
 
                 </div>
 
-                {/* SIH INNOVATION SUMMARY */}
+                {/* PLATFORM VALUE SUMMARY */}
                 <div className="p-4 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-xs text-emerald-200 space-y-1">
-                    <strong className="text-emerald-300 text-sm block">SIH Core Solution Innovations:</strong>
+                    <strong className="text-emerald-300 text-sm block">Core Platform Capabilities:</strong>
                     <p>
-                        1. Explainable crop recommendation using transparent agronomic bounds.
+                        1. Transparent crop recommendation using established agronomic requirements.
                     </p>
                     <p>
-                        2. Real-time interactive What-If crop scenario simulation.
+                        2. Real-time interactive scenario simulation and yield projections.
                     </p>
                     <p>
-                        3. Multilingual accessibility supporting English, Telugu, and Hindi.
+                        3. Multilingual voice synthesis in English, Telugu, and Hindi.
                     </p>
                     <p>
-                        4. Integrated decision support pipeline covering risk, suitability, weather, and action plan.
+                        4. Computer vision plant disease diagnostics with targeted treatments.
                     </p>
                 </div>
 
@@ -121,9 +121,9 @@ export function TechnicalDetailsModal({ isOpen, onClose, specs }: TechnicalDetai
                 <div className="flex justify-end pt-2">
                     <button
                         onClick={onClose}
-                        className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition cursor-pointer"
+                        className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition cursor-pointer"
                     >
-                        Close Technical Details
+                        Close Specifications
                     </button>
                 </div>
 

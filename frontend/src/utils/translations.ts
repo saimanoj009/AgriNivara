@@ -24,7 +24,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
         soilIntelligence: "Soil Intelligence & NPK Analysis",
         weatherIntelligence: "Live Weather & 5-Day Forecast",
         decisionSummary: "Farm Executive Decision Summary",
-        technicalDetails: "SIH Judge Technical Details",
+        technicalDetails: "Platform Specifications",
         futureModules: "Future Innovation Capabilities",
         
         // Labels
@@ -78,8 +78,8 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
         stopAudio: "Stop Voice Advisory",
         speaking: "Speaking advisory...",
 
-        // Judge Specs
-        judgeModalTitle: "SIH Judge Technical Inspection Panel",
+        // Technical Specs
+        judgeModalTitle: "Platform Architecture & Specifications",
         modelArchitecture: "Model Architecture",
         explainabilityMethod: "Explainability Method",
         inferenceTime: "Inference Latency",
@@ -116,7 +116,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
         soilIntelligence: "నేల పోషకాల విశ్లేషణ (NPK)",
         weatherIntelligence: "వాతావరణ మరియు 5 రోజుల అంచనా",
         decisionSummary: "వ్యవసాయ నిర్ణయ సారాంశం",
-        technicalDetails: "SIH జడ్జ్ సాంకేతిక వివరాలు",
+        technicalDetails: "సాంకేతిక వివరాలు",
         futureModules: "భావి ఆవిష్కరణ మాడ్యూల్స్",
 
         // Labels
@@ -128,40 +128,40 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
         ph: "నేల pH",
         rainfall: "వర్షపాతం (mm)",
         location: "పొలం ప్రాంతం",
-        confidence: "ఏఐ అంచనా విశ్వసనీయత",
+        confidence: "విశ్వసనీయత",
         ranking: "ర్యాంక్",
         crop: "పంట",
-        soilFit: "నేల అనుకూలత",
-        weatherFit: "వాతావరణ అనుకూలత",
-        waterFit: "నీటి అనుకూలత",
+        soilFit: "నేల సరిపోలిక",
+        weatherFit: "వాతావరణ సరిపోలిక",
+        waterFit: "నీటి సరిపోలిక",
         riskLevel: "ప్రమాద స్థాయి",
 
         // Action Plan Tabs
         beforePlanting: "నాటు వేసే ముందు",
-        duringGrowth: "పంట పెరుగుదల సమయంలో",
-        warning: "హెచ్చరికలు మరియు ప్రమాదాలు",
-        nextAction: "తదుపరి చేయాల్సిన పని",
+        duringGrowth: "పెరుగుదల సమయంలో",
+        warning: "హెచ్చరికలు & ప్రమాదాలు",
+        nextAction: "తదుపరి చర్య",
 
         // Statuses
-        good: "బాగుంది",
+        good: "మంచిది",
         moderate: "మధ్యస్థం",
         needsAttention: "శ్రద్ధ అవసరం",
         low: "తక్కువ",
         high: "ఎక్కువ",
         acidic: "ఆమ్ల గుణం",
-        suitable: "అనుకూలం",
+        suitable: "అనుకూలమైనది",
         alkaline: "క్షార గుణం",
 
         // What-If
-        currentConditions: "ప్రస్తుత పొలం పరిస్థితులు",
-        changedConditions: "మార్చిన పరిస్థితులు (సిమ్యులేషన్)",
-        simulateChange: "సిమ్యులేషన్ చేయండి",
-        resetSimulator: "యథాస్థితికి తీసుకురండి",
+        currentConditions: "ప్రస్తుత పరిస్థితులు",
+        changedConditions: "మార్చిన పరిస్థితులు",
+        simulateChange: "సిమ్యులేట్ చేయండి",
+        resetSimulator: "రీసెట్ చేయండి",
 
         // Badges / Tags
-        aiModelTag: "[ఏఐ/ఎంఎల్ అంచనా]",
+        aiModelTag: "[ఏఐ అంచనా]",
         ruleBasedTag: "[వ్యవసాయ సూత్రాలు]",
-        liveDataTag: "[లైవ్ వాతావరణ సమాచారం]",
+        liveDataTag: "[లైవ్ వాతావరణం]",
         simulatedTag: "[సిమ్యులేషన్]",
         futureTag: "[భవిష్యత్తు మాడ్యూల్]",
 
@@ -170,8 +170,8 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
         stopAudio: "వాయిస్ ఆపండి",
         speaking: "వాయిస్ చెబుతోంది...",
 
-        // Judge Specs
-        judgeModalTitle: "SIH జడ్జ్ సాంకేతిక తనిఖీ ప్యానెల్",
+        // Technical Specs
+        judgeModalTitle: "సాంకేతిక వివరాల ప్యానెల్",
         modelArchitecture: "మోడల్ నిర్మాణం",
         explainabilityMethod: "వివరణాత్మక విధానం",
         inferenceTime: "పనిచేసే సమయం (ల్యాటెన్సీ)",
@@ -208,7 +208,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
         soilIntelligence: "मिट्टी पोषण विश्लेषण (NPK)",
         weatherIntelligence: "मौसम एवं 5-दिवसीय पूर्वानुमान",
         decisionSummary: "कृषि निर्णय सारांश",
-        technicalDetails: "SIH जज तकनीकी विवरण",
+        technicalDetails: "तकनीकी विवरण",
         futureModules: "भावी नवाचार मॉड्यूल",
 
         // Labels
@@ -262,8 +262,8 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
         stopAudio: "आवाज बंद करें",
         speaking: "सलाह बोली जा रही है...",
 
-        // Judge Specs
-        judgeModalTitle: "SIH जज तकनीकी निरीक्षण पैनल",
+        // Technical Specs
+        judgeModalTitle: "तकनीकी निरीक्षण एवं विनिर्देश पैनल",
         modelArchitecture: "मॉडल आर्किटेक्चर",
         explainabilityMethod: "व्याख्यात्मक विधि",
         inferenceTime: "अनुमान समय (विलंबता)",

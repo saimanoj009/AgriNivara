@@ -1,370 +1,396 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-    fetchRealtimeWeatherApi,
-    searchLocationApi
+  ArrowLeft,
+  CloudSun,
+  MapPin,
+  Search,
+  Loader2,
+  Droplets,
+  Wind,
+  ThermometerSun,
+  AlertTriangle,
+  CheckCircle2,
+  Sparkles,
+  Calendar,
+  Layers,
+  ChevronRight,
+  Info,
+} from 'lucide-react';
+import {
+  fetchRealtimeWeatherApi,
+  searchLocationApi,
 } from '../services/api';
+import { AgriLogo } from '../components/ui/AgriLogo';
+import { GlassCard } from '../components/ui/GlassCard';
 
 interface LocationResult {
-    lat: string;
-    lon: string;
-    display_name: string;
-    name?: string;
-    type?: string;
+  lat: string;
+  lon: string;
+  display_name: string;
+  name?: string;
+  type?: string;
 }
 
 export default function Weather() {
-    const [q, setQ] = useState('');
-    const [suggestions, setSuggestions] = useState<LocationResult[]>([]);
-    const [weather, setWeather] = useState<any>(null);
-    const [selectedLocation, setSelectedLocation] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [searchingLocations, setSearchingLocations] = useState(false);
-    const [error, setError] = useState('');
+  const [q, setQ] = useState('');
+  const [suggestions, setSuggestions] = useState<LocationResult[]>([]);
+  const [weather, setWeather] = useState<any>(null);
+  const [selectedLocation, setSelectedLocation] = useState('Hyderabad, Telangana');
+  const [loading, setLoading] = useState(false);
+  const [searchingLocations, setSearchingLocations] = useState(false);
+  const [error, setError] = useState('');
 
-    const suggestionRef = useRef<HTMLDivElement>(null);
+  const suggestionRef = useRef<HTMLDivElement>(null);
 
-    // ------------------------------------------------------------
-    // LOCATION AUTOCOMPLETE
-    // ------------------------------------------------------------
-    useEffect(() => {
-        const query = q.trim();
+  // Load default weather on mount
+  useEffect(() => {
+    loadWeather(17.385, 78.4867, 'Hyderabad, Telangana');
+  }, []);
 
-        if (query.length < 3) {
-            setSuggestions([]);
-            return;
-        }
+  // Location autocomplete
+  useEffect(() => {
+    const query = q.trim();
+    if (query.length < 3) {
+      setSuggestions([]);
+      return;
+    }
 
-        const timer = setTimeout(async () => {
-            setSearchingLocations(true);
-
-            try {
-                const results = await searchLocationApi(query);
-
-                setSuggestions(
-                    (results || []).slice(0, 5).map((item: any) => ({
-                        lat: String(item.lat),
-                        lon: String(item.lon),
-                        display_name: item.display_name,
-                        name: item.name,
-                        type: item.type
-                    }))
-                );
-            } catch {
-                setSuggestions([]);
-            } finally {
-                setSearchingLocations(false);
-            }
-        }, 400);
-
-        return () => clearTimeout(timer);
-    }, [q]);
-
-    // Close suggestions when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (
-                suggestionRef.current &&
-                !suggestionRef.current.contains(event.target as Node)
-            ) {
-                setSuggestions([]);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-    // ------------------------------------------------------------
-    // FETCH WEATHER
-    // ------------------------------------------------------------
-    const loadWeather = async (
-        lat: number,
-        lon: number,
-        locationName: string
-    ) => {
-        setLoading(true);
-        setError('');
-        setSuggestions([]);
-
-        try {
-            const result = await fetchRealtimeWeatherApi(lat, lon);
-
-            setWeather(result);
-            setSelectedLocation(locationName);
-        } catch (err) {
-            console.error(err);
-            setWeather(null);
-            setError(
-                'Unable to load live weather. Please check your internet connection and try again.'
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // ------------------------------------------------------------
-    // SELECT LOCATION
-    // ------------------------------------------------------------
-    const selectLocation = async (location: LocationResult) => {
-        setQ(location.name || location.display_name.split(',')[0]);
-
-        await loadWeather(
-            Number(location.lat),
-            Number(location.lon),
-            location.display_name
+    const timer = setTimeout(async () => {
+      setSearchingLocations(true);
+      try {
+        const results = await searchLocationApi(query);
+        setSuggestions(
+          (results || []).slice(0, 5).map((item: any) => ({
+            lat: String(item.lat),
+            lon: String(item.lon),
+            display_name: item.display_name,
+            name: item.name,
+            type: item.type,
+          }))
         );
+      } catch {
+        setSuggestions([]);
+      } finally {
+        setSearchingLocations(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [q]);
+
+  // Click outside to dismiss autocomplete
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        suggestionRef.current &&
+        !suggestionRef.current.contains(event.target as Node)
+      ) {
+        setSuggestions([]);
+      }
     };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-    // ------------------------------------------------------------
-    // MANUAL SEARCH
-    // ------------------------------------------------------------
-    const search = async () => {
-        const query = q.trim();
+  const loadWeather = async (lat: number, lon: number, locationName: string) => {
+    setLoading(true);
+    setError('');
+    setSuggestions([]);
 
-        if (query.length < 3) {
-            setError('Please enter at least 3 characters.');
-            return;
-        }
+    try {
+      const result = await fetchRealtimeWeatherApi(lat, lon);
+      setWeather(result);
+      setSelectedLocation(locationName);
+    } catch (err) {
+      console.error(err);
+      setWeather(null);
+      setError('Unable to load live weather from satellite API. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        setLoading(true);
-        setError('');
+  const selectLocation = async (location: LocationResult) => {
+    setQ(location.name || location.display_name.split(',')[0]);
+    await loadWeather(
+      Number(location.lat),
+      Number(location.lon),
+      location.display_name
+    );
+  };
 
-        try {
-            const results = await searchLocationApi(query);
+  const handleManualSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const query = q.trim();
+    if (query.length < 3) return;
 
-            if (!results || results.length === 0) {
-                setWeather(null);
-                setError('Location not found. Try another village, town or district.');
-                return;
-            }
+    setLoading(true);
+    setError('');
+    try {
+      const results = await searchLocationApi(query);
+      if (results && results.length > 0) {
+        await selectLocation(results[0]);
+      } else {
+        setError('Location not found. Please try another query.');
+      }
+    } catch {
+      setError('Failed to search location.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            const location = results[0];
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 pb-20 selection:bg-emerald-500 selection:text-slate-950">
+      
+      {/* HEADER */}
+      <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/80 px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Link
+            to="/dashboard"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-xs font-bold text-emerald-400 border border-slate-800 transition"
+          >
+            <ArrowLeft size={16} />
+            <span className="hidden sm:inline">Dashboard</span>
+          </Link>
+          <AgriLogo size="sm" variant="dark" />
+        </div>
 
-            setSuggestions([]);
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-extrabold px-3 py-1 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-500/30">
+            Open-Meteo Satellite Feed
+          </span>
+        </div>
+      </header>
 
-            await loadWeather(
-                Number(location.lat),
-                Number(location.lon),
-                location.display_name
-            );
-        } catch (err) {
-            console.error(err);
-            setWeather(null);
-            setError('Unable to find this location.');
-        } finally {
-            setLoading(false);
-        }
-    };
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
+        
+        {/* TOP SEARCH & PRESETS BANNER */}
+        <div className="text-center max-w-2xl mx-auto space-y-2">
+          <span className="text-xs font-black uppercase tracking-widest text-emerald-400">
+            Agro-Meteorological Engine
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+            Hyperlocal Weather & Farm Advisories
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-400">
+            Real-time atmospheric telemetry transformed into actionable agronomic decisions for irrigation, spraying, and harvest timing.
+          </p>
+        </div>
 
-    return (
-        <div className="min-h-screen bg-slate-50 p-5 lg:p-10">
-            <div className="max-w-5xl mx-auto">
+        {/* SEARCH BAR & DISTRICT PRESETS */}
+        <div className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 space-y-4">
+          <form onSubmit={handleManualSearch} className="relative max-w-2xl mx-auto" ref={suggestionRef}>
+            <div className="relative flex items-center">
+              <MapPin className="w-5 h-5 text-emerald-400 absolute left-4" />
+              <input
+                type="text"
+                placeholder="Search farm village, mandal, or district (e.g. Warangal, Guntur, Ludhiana)..."
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                className="w-full pl-12 pr-28 py-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-sm font-bold text-white placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className="absolute right-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition disabled:opacity-50"
+              >
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Fetch Weather'}
+              </button>
+            </div>
 
-                <Link
-                    to="/dashboard"
-                    className="text-green-700 font-bold hover:underline"
-                >
-                    ← Dashboard
-                </Link>
+            {/* Suggestions Dropdown */}
+            {suggestions.length > 0 && (
+              <div className="absolute top-full left-0 right-0 z-30 mt-2 bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 overflow-hidden max-h-56 overflow-y-auto">
+                {suggestions.map((item, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => selectLocation(item)}
+                    className="w-full text-left px-4 py-3 text-xs hover:bg-emerald-950/70 text-slate-200 font-medium truncate border-b border-slate-800/60 last:border-0 cursor-pointer flex items-center gap-2"
+                  >
+                    <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span>{item.display_name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </form>
 
-                <h1 className="text-3xl font-black mt-6">
-                    Live Weather Intelligence
-                </h1>
+          {/* Quick Region Buttons */}
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-2 border-t border-slate-800/80 text-xs">
+            <span className="text-slate-500 text-[10px] font-extrabold uppercase mr-1">Popular Agricultural Hubs:</span>
+            {[
+              { label: 'Guntur, AP', lat: 16.3067, lon: 80.4365 },
+              { label: 'Warangal, TS', lat: 17.9689, lon: 79.5941 },
+              { label: 'Ludhiana, PB', lat: 30.9010, lon: 75.8573 },
+              { label: 'Nashik, MH', lat: 19.9975, lon: 73.7898 },
+            ].map((hub, idx) => (
+              <button
+                key={idx}
+                onClick={() => loadWeather(hub.lat, hub.lon, hub.label)}
+                className="px-3 py-1 rounded-lg bg-slate-950 hover:bg-slate-850 text-slate-300 hover:text-emerald-400 border border-slate-800 text-[11px] font-bold transition"
+              >
+                {hub.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
-                <p className="text-slate-500 mt-2">
-                    Search your farm location to retrieve current conditions
-                    and a five-day forecast.
-                </p>
+        {error && (
+          <div className="p-4 rounded-2xl bg-rose-950/60 border border-rose-800 text-xs text-rose-300 flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
 
-                {/* SEARCH */}
-                <div className="mt-6 relative" ref={suggestionRef}>
-                    <div className="flex gap-2">
-                        <input
-                            value={q}
-                            onChange={(e) => {
-                                setQ(e.target.value);
-                                setError('');
-                            }}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    search();
-                                }
-                            }}
-                            placeholder="Enter village, town or district"
-                            className="flex-1 border border-slate-300 rounded-xl p-3 outline-none focus:ring-2 focus:ring-green-500"
-                        />
-
-                        <button
-                            onClick={search}
-                            disabled={loading}
-                            className="bg-green-700 hover:bg-green-800 disabled:bg-green-400 text-white rounded-xl px-5 font-bold"
-                        >
-                            {loading ? 'Loading...' : 'Search'}
-                        </button>
-                    </div>
-
-                    {/* AUTOCOMPLETE */}
-                    {(suggestions.length > 0 || searchingLocations) && (
-                        <div className="absolute z-50 left-0 right-[105px] mt-2 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden">
-
-                            {searchingLocations && (
-                                <div className="p-4 text-sm text-slate-500">
-                                    Searching locations...
-                                </div>
-                            )}
-
-                            {!searchingLocations &&
-                                suggestions.map((location, index) => (
-                                    <button
-                                        key={`${location.lat}-${location.lon}-${index}`}
-                                        onClick={() =>
-                                            selectLocation(location)
-                                        }
-                                        className="w-full text-left p-4 hover:bg-green-50 border-b last:border-b-0 transition"
-                                    >
-                                        <div className="flex items-start gap-3">
-                                            <span className="text-green-600 text-lg">
-                                                📍
-                                            </span>
-
-                                            <div>
-                                                <p className="font-bold text-slate-800">
-                                                    {location.name ||
-                                                        location.display_name.split(',')[0]}
-                                                </p>
-
-                                                <p className="text-xs text-slate-500 mt-1">
-                                                    {location.display_name}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </button>
-                                ))}
-                        </div>
-                    )}
+        {/* WEATHER DISPLAY DASHBOARD */}
+        {weather && (
+          <div className="space-y-6">
+            
+            {/* MAIN CURRENT WEATHER & DECISION HERO */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              
+              {/* CURRENT TELEMETRY CARD */}
+              <GlassCard variant="emerald" className="lg:col-span-7 p-6 sm:p-8 relative overflow-hidden">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                      Current Telemetry
+                    </span>
+                    <h2 className="text-xl sm:text-2xl font-black text-white mt-1 truncate max-w-md">
+                      {selectedLocation}
+                    </h2>
+                    <p className="text-xs text-slate-300 mt-0.5">{weather.condition}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-4xl sm:text-5xl font-black text-white">
+                      {weather.temperature}°C
+                    </span>
+                  </div>
                 </div>
 
-                {/* SELECTED LOCATION */}
-                {selectedLocation && (
-                    <div className="mt-4 inline-flex items-center gap-2 bg-green-50 border border-green-200 text-green-800 px-4 py-2 rounded-xl text-sm font-semibold">
-                        📍 {selectedLocation}
+                {/* Metrics Grid */}
+                <div className="grid grid-cols-3 gap-3 mt-6 pt-6 border-t border-slate-800">
+                  <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800">
+                    <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold mb-1">
+                      <Droplets className="w-4 h-4 text-teal-400" /> Humidity
                     </div>
-                )}
+                    <p className="text-lg font-black text-white">{weather.humidity}%</p>
+                    <span className="text-[10px] text-slate-400">Relative 2m</span>
+                  </div>
 
-                {/* ERROR */}
-                {error && (
-                    <div className="mt-4 bg-red-50 border border-red-200 text-red-700 rounded-xl p-4">
-                        {error}
+                  <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800">
+                    <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold mb-1">
+                      <CloudSun className="w-4 h-4 text-emerald-400" /> Rainfall
                     </div>
-                )}
+                    <p className="text-lg font-black text-white">{weather.rainfall} mm</p>
+                    <span className="text-[10px] text-slate-400">Past 24h</span>
+                  </div>
 
-                {/* LOADING */}
-                {loading && !weather && (
-                    <div className="mt-8 bg-white border rounded-2xl p-8 text-center">
-                        <div className="text-3xl mb-3">🌦️</div>
-                        <p className="font-bold text-slate-700">
-                            Fetching live weather...
-                        </p>
-                        <p className="text-sm text-slate-500 mt-1">
-                            Getting current conditions for your selected location.
-                        </p>
+                  <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800">
+                    <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold mb-1">
+                      <Wind className="w-4 h-4 text-amber-400" /> Wind Speed
                     </div>
-                )}
+                    <p className="text-lg font-black text-white">{weather.windSpeed} km/h</p>
+                    <span className="text-[10px] text-slate-400">Surface flow</span>
+                  </div>
+                </div>
+              </GlassCard>
 
-                {/* WEATHER */}
-                {weather && (
-                    <>
-                        <div className="grid md:grid-cols-4 gap-4 mt-7">
-                            <W
-                                t="Temperature"
-                                v={`${weather.temperature}°C`}
-                            />
+              {/* AGRICULTURAL DECISION TRANSLATION CARD */}
+              <GlassCard variant="dark" className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 pb-4 border-b border-slate-800">
+                    <Sparkles className="w-4 h-4 text-emerald-400" />
+                    <h3 className="text-xs font-black uppercase tracking-wider text-white">
+                      Agricultural Decision Translation
+                    </h3>
+                  </div>
 
-                            <W
-                                t="Humidity"
-                                v={`${weather.humidity}%`}
-                            />
+                  <div className="mt-5 space-y-4">
+                    <div className="p-4 rounded-2xl bg-emerald-950/50 border border-emerald-500/30">
+                      <span className="text-[10px] font-black uppercase text-emerald-400 tracking-wider block">
+                        Primary Agro-Advisory:
+                      </span>
+                      <p className="text-sm font-bold text-white mt-1 leading-snug">
+                        {weather.risk}
+                      </p>
+                    </div>
 
-                            <W
-                                t="Rainfall"
-                                v={`${weather.rainfall} mm`}
-                            />
+                    <div className="space-y-2 text-xs text-slate-300">
+                      <div className="flex items-start gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                        <span>
+                          {weather.rainfall > 10
+                            ? 'Delay irrigation by 24h to avoid waterlogging and nutrient loss.'
+                            : 'Optimal conditions for drip or surface irrigation schedule.'}
+                        </span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                        <span>
+                          {weather.humidity > 80
+                            ? 'High humidity warning: monitor leaves for fungal spore development.'
+                            : 'Low fungal risk profile: ideal window for foliar nutrient spraying.'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-                            <W
-                                t="Wind"
-                                v={`${weather.windSpeed} km/h`}
-                            />
-                        </div>
-
-                        <div className="bg-white border rounded-2xl p-6 mt-6">
-
-                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                                <div>
-                                    <h2 className="font-black text-xl">
-                                        {weather.condition}
-                                    </h2>
-
-                                    <p className="text-sm text-slate-500 mt-1">
-                                        {weather.risk}
-                                    </p>
-                                </div>
-
-                                <div className="text-sm font-semibold text-green-700 bg-green-50 px-4 py-2 rounded-xl">
-                                    Live Weather
-                                </div>
-                            </div>
-
-                            <div className="grid md:grid-cols-5 gap-3 mt-5">
-                                {weather.forecast?.map((d: any) => (
-                                    <div
-                                        key={d.date}
-                                        className="rounded-xl bg-slate-50 p-4"
-                                    >
-                                        <b>{d.day}</b>
-
-                                        <p className="text-sm mt-2">
-                                            {d.tempMin}–{d.tempMax}°C
-                                        </p>
-
-                                        <p className="text-xs text-blue-700 mt-1">
-                                            Rain {d.rainProb}%
-                                        </p>
-
-                                        <p className="text-xs text-slate-500 mt-1">
-                                            {d.condition}
-                                        </p>
-
-                                        {d.rainfallMm !== undefined && (
-                                            <p className="text-xs text-slate-500 mt-1">
-                                                {d.rainfallMm} mm expected
-                                            </p>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </>
-                )}
+                <div className="mt-4 pt-4 border-t border-slate-800 text-[10px] font-extrabold text-slate-500 uppercase flex items-center justify-between">
+                  <span>AI Crop Protection Protocol</span>
+                  <span className="text-emerald-400">Active</span>
+                </div>
+              </GlassCard>
 
             </div>
-        </div>
-    );
-}
 
-function W({ t, v }: { t: string; v: string }) {
-    return (
-        <div className="bg-white border rounded-2xl p-5">
-            <p className="text-xs text-slate-500 font-bold">
-                {t}
-            </p>
+            {/* 5-DAY AGRO-METEOROLOGICAL FORECAST */}
+            {weather.forecast && weather.forecast.length > 0 && (
+              <div className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-emerald-400" />
+                    <h3 className="text-sm font-black text-white uppercase tracking-wider">
+                      5-Day Agro-Meteorological Forecast
+                    </h3>
+                  </div>
+                  <span className="text-xs text-slate-500">Hourly synoptic model</span>
+                </div>
 
-            <b className="text-2xl mt-2 block">
-                {v}
-            </b>
-        </div>
-    );
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                  {weather.forecast.map((day: any, idx: number) => (
+                    <div
+                      key={idx}
+                      className="p-4 rounded-2xl bg-slate-950 border border-slate-800 text-center space-y-2"
+                    >
+                      <span className="text-xs font-black text-emerald-400 block">{day.day}</span>
+                      <span className="text-[10px] text-slate-500 block font-bold">{day.date}</span>
+                      
+                      <div className="py-2">
+                        <span className="text-xl font-black text-white">{day.tempMax}°</span>
+                        <span className="text-xs text-slate-400 ml-1">/ {day.tempMin}°</span>
+                      </div>
+
+                      <div className="p-1.5 rounded-lg bg-slate-900 text-[10px] font-bold text-teal-300 flex items-center justify-center gap-1">
+                        <Droplets className="w-3 h-3 text-teal-400" />
+                        <span>{day.rainProb}% Rain</span>
+                      </div>
+
+                      <p className="text-[10px] text-slate-400 truncate">{day.condition}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          </div>
+        )}
+
+      </main>
+    </div>
+  );
 }
