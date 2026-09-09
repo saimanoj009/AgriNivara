@@ -1,43 +1,26 @@
-# Dependencies
-node_modules/
-frontend/node_modules/
-backend/__pycache__/
-backend/*.pyc
-backend/*.pyo
-**/__pycache__/
-**/*.pyc
-**/*.pyo
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.log
 
-# Build outputs
-frontend/dist/
-frontend/build/
+# Node
+node_modules/
+dist/
+
+# Local database (recreated automatically on startup)
+backend/agrinivara_users.db
 
 # Environment files
 .env
-.env.local
-.env.*.local
-backend/.env
+.env.*
+!.env.example
 
-# Logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Editor / OS
-.vscode/
-.idea/
+# OS / editor
 .DS_Store
-Thumbs.db
+.vscode/
 
-# Python virtual envs
-venv/
-.venv/
-env/
-
-# ML model files (large binaries — optional, remove if you want to track them)
-# backend/model/*.joblib
-# backend/model/*.keras
-
-# Misc
-*.pem
+# Large ML model - too big for GitHub (134MB > 100MB limit)
+# Set PLANT_DISEASE_MODEL_URL env var on Render to provide the model
+backend/model/plant_disease_model.keras

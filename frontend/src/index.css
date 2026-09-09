@@ -1,0 +1,304 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* DARK BOTANICAL LUXURY DESIGN SYSTEM TOKENS */
+    --bg-primary: #071c17;
+    --bg-secondary: #0a211b;
+    --bg-deep: #051411;
+    --surface-1: #102d25;
+    --surface-2: #12362b;
+    --surface-elevated: #183f33;
+    --surface-card: #0e2b23;
+    
+    --primary-emerald: #00b884;
+    --primary-emerald-hover: #12c995;
+    --primary-emerald-glow: rgba(0, 184, 132, 0.25);
+    
+    --accent-gold: #d6a84f;
+    --accent-gold-hover: #e0b65a;
+    --accent-gold-glow: rgba(214, 168, 79, 0.25);
+    
+    --accent-teal: #0f766e;
+    --accent-teal-light: #14b8a6;
+    
+    --text-primary: #f3ebdd;
+    --text-ivory: #fbf8f3;
+    --text-secondary: #a8b9ae;
+    --text-muted: #738a7c;
+    
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-emerald: rgba(0, 184, 132, 0.2);
+    --border-gold: rgba(214, 168, 79, 0.25);
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #071c17;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(0, 184, 132, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(214, 168, 79, 0.05) 0px, transparent 50%),
+      radial-gradient(at 50% 50%, rgba(15, 118, 110, 0.06) 0px, transparent 60%);
+    background-attachment: fixed;
+    color: #f3ebdd;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+}
+
+/* ========================================================================= */
+/* LUXURY BOTANICAL CARD SURFACES & UTILITIES                                */
+/* ========================================================================= */
+
+.botanical-card {
+  background-color: #102d25;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
+  color: #f3ebdd;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.botanical-card:hover {
+  border-color: rgba(0, 184, 132, 0.3);
+  box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.45), 0 0 15px rgba(0, 184, 132, 0.08);
+}
+
+.botanical-card-interactive {
+  background-color: #102d25;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.botanical-card-interactive:hover {
+  border-color: rgba(0, 184, 132, 0.45);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px -4px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 184, 132, 0.12);
+}
+
+.botanical-card-elevated {
+  background-color: #143b30;
+  border: 1px solid rgba(0, 184, 132, 0.2);
+  border-radius: 1.25rem;
+  box-shadow: 0 6px 25px -3px rgba(0, 0, 0, 0.4);
+}
+
+.botanical-glass-header {
+  background: rgba(10, 33, 27, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.botanical-glass-panel {
+  background: linear-gradient(135deg, rgba(18, 54, 43, 0.85) 0%, rgba(10, 33, 27, 0.95) 100%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(0, 184, 132, 0.25);
+  border-radius: 1.25rem;
+}
+
+/* ========================================================================= */
+/* LUXURY BOTANICAL INPUTS & FORMS                                           */
+/* ========================================================================= */
+
+.botanical-input {
+  background-color: #0c241e;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f3ebdd;
+  border-radius: 0.875rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.botanical-input:focus {
+  border-color: #00b884;
+  box-shadow: 0 0 0 3px rgba(0, 184, 132, 0.18);
+}
+
+.botanical-input::placeholder {
+  color: #738a7c;
+}
+
+/* ========================================================================= */
+/* STATUS BADGES (DARK BOTANICAL)                                            */
+/* ========================================================================= */
+
+.badge-botanical-submitted {
+  background-color: rgba(168, 185, 174, 0.15);
+  color: #a8b9ae;
+  border: 1px solid rgba(168, 185, 174, 0.3);
+}
+
+.badge-botanical-review {
+  background-color: rgba(214, 168, 79, 0.18);
+  color: #e0b65a;
+  border: 1px solid rgba(214, 168, 79, 0.35);
+}
+
+.badge-botanical-approved {
+  background-color: rgba(15, 118, 110, 0.25);
+  color: #2dd4bf;
+  border: 1px solid rgba(20, 184, 166, 0.35);
+}
+
+.badge-botanical-completed {
+  background-color: rgba(0, 184, 132, 0.2);
+  color: #12c995;
+  border: 1px solid rgba(0, 184, 132, 0.4);
+}
+
+.badge-botanical-rejected {
+  background-color: rgba(225, 29, 72, 0.18);
+  color: #fb7185;
+  border: 1px solid rgba(225, 29, 72, 0.35);
+}
+
+/* ========================================================================= */
+/* SKELETONS & MICRO-ANIMATIONS                                              */
+/* ========================================================================= */
+
+.skeleton-botanical {
+  background: linear-gradient(90deg, #0e2b23 25%, #183f33 50%, #0e2b23 75%);
+  background-size: 200% 100%;
+  animation: shimmer-botanical 1.8s infinite;
+  border-radius: 0.625rem;
+}
+
+@keyframes shimmer-botanical {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes scan-line {
+  0% {
+    top: 0%;
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0.8;
+  }
+}
+
+@keyframes pulse-droplet {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 6px rgba(0, 184, 132, 0.4));
+  }
+  50% {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 14px rgba(0, 184, 132, 0.7));
+  }
+}
+
+@keyframes glow-gold {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(214, 168, 79, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(214, 168, 79, 0.35);
+  }
+}
+
+.animate-scan-line {
+  animation: scan-line 2.2s ease-in-out infinite alternate;
+}
+
+.animate-droplet {
+  animation: pulse-droplet 2.8s ease-in-out infinite;
+}
+
+.animate-gold-glow {
+  animation: glow-gold 3s ease-in-out infinite;
+}
+
+/* ========================================================================= */
+/* ACCESSIBILITY & FOCUS STATES                                              */
+/* ========================================================================= */
+
+:focus-visible {
+  outline: 2px solid #00b884 !important;
+  outline-offset: 2px !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.btn-botanical-primary {
+  background: linear-gradient(135deg, #0f766e 0%, #00b884 100%);
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 0.875rem;
+  padding: 0.625rem 1.25rem;
+  box-shadow: 0 4px 14px 0 rgba(0, 184, 132, 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-botanical-primary:hover {
+  background: linear-gradient(135deg, #115e59 0%, #12c995 100%);
+  box-shadow: 0 6px 20px 0 rgba(0, 184, 132, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-botanical-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px 0 rgba(0, 184, 132, 0.2);
+}
+
+.btn-botanical-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: #f3ebdd;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.875rem;
+  padding: 0.625rem 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.btn-botanical-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fbf8f3;
+}
+
+/* ========================================================================= */
+/* SCROLLBAR & SAFE AREAS                                                    */
+/* ========================================================================= */
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0.5rem);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #071c17;
+}
+::-webkit-scrollbar-thumb {
+  background: #183f33;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00b884;
+}

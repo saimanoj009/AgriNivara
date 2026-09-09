@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: agrinivara
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    envVars:
+      - key: PORT
+        value: "7860"
+      - key: AGRINIVARA_AUTH_SECRET
+        generateValue: true
+      - key: PLANT_DISEASE_MODEL_URL
+        sync: false
