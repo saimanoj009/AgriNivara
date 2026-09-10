@@ -126,16 +126,18 @@ export async function predictDiseaseApi(file: File): Promise<any> {
 
         const data = await response.json().catch(() => ({}));
         if (!response.ok) {
-            if (response.status === 404) {
-                throw new Error('Disease diagnosis service endpoint was not found (404). The AI prediction server may be offline or initializing.');
-            } else if (response.status === 503) {
-                throw new Error('Disease diagnosis service is temporarily busy or downloading the deep neural network weights. Please retry in a moment.');
-            } else if (response.status === 413) {
-                throw new Error('The uploaded image file is too large. Please upload an image under 10MB.');
-            }
+            // Extract the most specific error message from backend response
             const detail = typeof data?.detail === 'string'
                 ? data.detail
                 : data?.detail?.message || data?.message;
+
+            if (response.status === 404) {
+                throw new Error(detail || 'Disease diagnosis service endpoint was not found (404). The AI prediction server may be offline or initializing.');
+            } else if (response.status === 503) {
+                throw new Error(detail || 'Disease diagnosis service is initializing. Please retry in a moment.');
+            } else if (response.status === 413) {
+                throw new Error('The uploaded image file is too large. Please upload an image under 10MB.');
+            }
             throw new Error(detail || `Disease prediction failed with status ${response.status}`);
         }
         return data;

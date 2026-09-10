@@ -4250,9 +4250,21 @@ def get_irrigation_decision(req: IrrigationRequest):
 async def predict_disease(
     file: UploadFile = File(...)
 ):
+    # Import fallback engine
+    try:
+        try:
+            from backend.disease.predict import predict_disease_fallback as _predict_disease_fallback
+        except ImportError:
+            try:
+                from disease.predict import predict_disease_fallback as _predict_disease_fallback
+            except ImportError:
+                from ..disease.predict import predict_disease_fallback as _predict_disease_fallback
+    except Exception as _fb_import_err:
+        print(f"[WARN] Could not import fallback engine: {_fb_import_err}")
+        _predict_disease_fallback = None
 
     # --------------------------------------------------------
-    # MODEL CHECK
+    # MODEL CHECK — attempt load, fallback gracefully
     # --------------------------------------------------------
 
     model = disease_model_loader.get_model()
@@ -4269,24 +4281,8 @@ async def predict_disease(
             model = disease_model_loader.get_model()
         loader_info = disease_model_loader.info()
 
-    if model is None:
-        if loader_info["status"] == "failed":
-            message = loader_info.get("model_error") or "Plant disease model failed to load."
-        else:
-            message = "Plant disease model is not ready yet. Please try again."
-        raise HTTPException(
-            status_code=503,
-            detail={"message": message, "model_info": loader_info}
-        )
-
-    if tf is None:
-        raise HTTPException(
-            status_code=503,
-            detail={
-                "message": "TensorFlow is not available on the server.",
-                "model_info": loader_info,
-            }
-        )
+    # If model still not ready, use fallback vision engine instead of 503
+    _use_fallback = (model is None or tf is None)
 
     # --------------------------------------------------------
     # FILE TYPE CHECK
@@ -4317,6 +4313,19 @@ async def predict_disease(
                 status_code=400,
                 detail="Uploaded image is empty."
             )
+
+        # If model is not loaded, use fallback immediately
+        if _use_fallback:
+            print("[predict_disease] CNN model not ready — using Foliar Vision Engine fallback.")
+            if _predict_disease_fallback is not None:
+                result = _predict_disease_fallback(image_bytes, file.filename or "leaf.jpg")
+                result["model_status"] = loader_info
+                return result
+            else:
+                raise HTTPException(
+                    status_code=503,
+                    detail="Disease diagnosis service is initializing. Please retry in a moment."
+                )
 
         print("=" * 70)
         print("PLANT DISEASE PREDICTION")
@@ -4368,10 +4377,18 @@ async def predict_disease(
         # MODEL PREDICTION
         # ----------------------------------------------------
 
-        predictions = model.predict(
-            image,
-            verbose=0
-        )
+        try:
+            predictions = model.predict(
+                image,
+                verbose=0
+            )
+        except Exception as _pred_err:
+            print(f"[predict_disease] CNN predict() failed: {_pred_err}. Using fallback.")
+            if _predict_disease_fallback is not None:
+                result = _predict_disease_fallback(image_bytes, file.filename or "leaf.jpg")
+                result["model_status"] = disease_model_loader.info()
+                return result
+            raise
 
         predictions = np.asarray(predictions)
 
