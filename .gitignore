@@ -21,6 +21,5 @@ backend/agrinivara_users.db
 .DS_Store
 .vscode/
 
-# Large ML model - too big for GitHub (134MB > 100MB limit)
-# Set PLANT_DISEASE_MODEL_URL env var on Render to provide the model
-backend/model/plant_disease_model.keras
+# ML model files — tracked via Git LFS (not gitignored)
+# *.keras and *.h5 are handled by .gitattributes (git lfs track)

@@ -1,3 +1,5 @@
 # No Git LFS — plant_disease_model.keras is excluded from git entirely.
 # It is downloaded at runtime via PLANT_DISEASE_MODEL_URL env var.
 # The crop_recommendation_model.joblib (46MB) is committed directly.
+*.keras filter=lfs diff=lfs merge=lfs -text
+*.h5 filter=lfs diff=lfs merge=lfs -text
