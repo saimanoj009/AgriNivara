@@ -298,9 +298,45 @@ class DiseaseModelLoader:
             )
             self._thread.start()
 
+    @staticmethod
+    def _get_memory_limit_mb() -> float:
+        try:
+            cgroup_v2 = Path("/sys/fs/cgroup/memory.max")
+            if cgroup_v2.exists():
+                val = cgroup_v2.read_text(errors="ignore").strip()
+                if val != "max" and val.isdigit():
+                    return int(val) / (1024 * 1024)
+            cgroup_v1 = Path("/sys/fs/cgroup/memory/memory.limit_in_bytes")
+            if cgroup_v1.exists():
+                val = cgroup_v1.read_text(errors="ignore").strip()
+                if val.isdigit() and int(val) < 100 * 1024 * 1024 * 1024:
+                    return int(val) / (1024 * 1024)
+            meminfo = Path("/proc/meminfo")
+            if meminfo.exists():
+                for line in meminfo.read_text(errors="ignore").splitlines():
+                    if line.startswith("MemTotal:"):
+                        return int(line.split()[1]) / 1024
+        except Exception:
+            pass
+        return 2048.0
+
     def load_model(self) -> None:
         global tf, plant_model, plant_model_error
         try:
+            # Memory safety check: Render free tier has 512MB RAM.
+            # TensorFlow + 134MB Keras model allocates >700MB and gets killed with SIGKILL (OOM -> 502).
+            mem_limit = self._get_memory_limit_mb()
+            force_tf = os.getenv("FORCE_TF_MODEL_LOAD", "").lower() in {"1", "true", "yes"}
+            if mem_limit < 700 and not force_tf:
+                print(f"[MEMORY SAFETY] Container memory limit is {mem_limit:.1f} MB (< 700 MB).")
+                print("Using lightweight high-speed Foliar Vision Engine to prevent OOM crash (502).")
+                with self._lock:
+                    self._model = None
+                    self._error = None
+                    self._status = "foliar_engine_active"
+                    self._finished_at = datetime.now(timezone.utc).isoformat()
+                return
+
             print("Preparing plant disease model...")
             if not self._is_valid_model_file(self.model_path):
                 if self.model_url:

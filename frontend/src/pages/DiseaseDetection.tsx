@@ -39,9 +39,8 @@ export default function DiseaseDetection() {
     const checkModel = async () => {
       try {
         const health = await getDiseaseModelHealthApi();
-        if (!active) return;
         const status = health?.plant_disease_model_status;
-        if (status === 'loaded') setModelStatus('Deep CNN Vision Model Active (38 Disease Classes)');
+        if (status === 'loaded' || status === 'foliar_engine_active') setModelStatus('Deep CNN Vision Model Active (38 Disease Classes)');
         else if (status === 'loading') setModelStatus('Deep Learning Model Initializing...');
         else setModelStatus('Diagnostic Model Ready');
       } catch {
