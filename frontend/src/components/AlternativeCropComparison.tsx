@@ -63,13 +63,23 @@ export function AlternativeCropComparison({ alternatives, lang }: AlternativeCro
                                         </span>
                                     </td>
 
-                                    {/* CROP NAME */}
+                                    {/* CROP NAME & BADGE */}
                                     <td className="py-3.5 px-4">
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 flex-wrap">
                                             <span className="text-sm font-bold text-[#F3EBDD]">{cropCap}</span>
                                             {isFirst && (
                                                 <span className="bg-[#00B884]/20 text-[#00B884] text-[9px] font-extrabold px-2 py-0.5 rounded-full border border-[#00B884]/30">
                                                     Top Choice
+                                                </span>
+                                            )}
+                                            {item.source === 'ml' && !isFirst && (
+                                                <span className="bg-[#38BDF8]/15 text-[#38BDF8] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#38BDF8]/30">
+                                                    🤖 AI ML
+                                                </span>
+                                            )}
+                                            {item.source === 'agronomic' && (
+                                                <span className="bg-[#D6A84F]/15 text-[#D6A84F] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#D6A84F]/30">
+                                                    🌱 Agronomic Alt
                                                 </span>
                                             )}
                                         </div>

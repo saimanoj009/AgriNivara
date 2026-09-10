@@ -2,11 +2,37 @@
 // AGRINIVARA - TYPESCRIPT TYPES FOR DECISION SUPPORT SYSTEM
 // ============================================================
 
+export interface StructuredLocation {
+    display_name: string;
+    village?: string;
+    city: string;
+    district?: string;
+    state: string;
+    country: string;
+    latitude: number;
+    longitude: number;
+}
+
 export interface LocationSuggestion {
-    place_id: number;
+    place_id: number | string;
     display_name: string;
     lat: string;
     lon: string;
+    name?: string;
+    type?: string;
+    address?: {
+        village?: string;
+        town?: string;
+        city?: string;
+        county?: string;
+        state_district?: string;
+        district?: string;
+        state?: string;
+        country?: string;
+        country_code?: string;
+        [key: string]: any;
+    };
+    structured?: StructuredLocation;
 }
 
 export interface FarmInputs {
@@ -83,6 +109,8 @@ export interface AlternativeAnalysis {
     weather_fit: string;
     water_fit: string;
     risk_rating: 'LOW' | 'MODERATE' | 'HIGH';
+    source?: 'ml' | 'agronomic';
+    badge?: string;
 }
 
 export interface SoilIntelligence {

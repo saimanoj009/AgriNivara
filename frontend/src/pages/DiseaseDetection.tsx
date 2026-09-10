@@ -94,9 +94,14 @@ export default function DiseaseDetection() {
         );
       }
     } catch (e: any) {
-      const msg = e.message || 'Pathogen diagnostic analysis failed. Please verify image clarity and backend connection.';
+      let msg = e.message || 'Pathogen diagnostic analysis failed. Please verify image clarity and backend connection.';
+      if (msg.includes('404')) {
+        msg = 'Diagnostic neural network model endpoint is temporarily unavailable (404). Please ensure the backend server is running with the disease model loaded, or test with the SIH Demo Samples below.';
+      } else if (msg.includes('503')) {
+        msg = 'Disease diagnostic engine is currently loading the neural network weights into memory. Please retry in a few seconds.';
+      }
       setError(msg);
-      toast.error(msg, 'Diagnosis Failed');
+      toast.error(msg, 'Diagnosis Unavailable');
     } finally {
       setLoading(false);
     }

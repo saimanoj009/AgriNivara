@@ -2,6 +2,7 @@ import React, {
     useEffect,
     useRef,
     useState,
+    useCallback,
 } from 'react';
 
 import {
@@ -19,6 +20,8 @@ import {
 
 import type { Language } from '../types/agriculture';
 import { askAgriNivaraApi } from '../services/api';
+import type { ChatContext, ChatHistoryItem } from '../services/api';
+import { useFarm } from '../context/FarmContext';
 
 interface Message {
     id: string;
@@ -26,8 +29,10 @@ interface Message {
     text: string;
     lang: Language;
     timestamp: string;
+    isError?: boolean;
 }
 
+// farmerContext prop kept for backward compat but farm data comes from FarmContext
 interface AskAgriNivaraFloatingProps {
     farmerContext?: {
         location?: string;
@@ -41,6 +46,9 @@ interface AskAgriNivaraFloatingProps {
 export const AskAgriNivaraFloating: React.FC<
     AskAgriNivaraFloatingProps
 > = ({ farmerContext }) => {
+    // Pull live farm data from global context
+    const { farmProfile, weather, irrigationDecision } = useFarm();
+
     const [isOpen, setIsOpen] = useState(false);
     const [input, setInput] = useState('');
     const [selectedLang, setSelectedLang] =
@@ -50,6 +58,8 @@ export const AskAgriNivaraFloating: React.FC<
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [isThinking, setIsThinking] = useState(false);
+    // Multi-turn conversation history sent to the API
+    const [chatHistory, setChatHistory] = useState<ChatHistoryItem[]>([]);
 
     const chatEndRef = useRef<HTMLDivElement | null>(null);
     const recognitionRef = useRef<any>(null);
@@ -64,6 +74,47 @@ export const AskAgriNivaraFloating: React.FC<
             minute: '2-digit',
         });
     };
+
+    // ---------------------------------------------------------
+    // BUILD RICH FARM CONTEXT FOR AI
+    // ---------------------------------------------------------
+
+    const buildChatContext = useCallback((): ChatContext => {
+        const locationStr = typeof farmProfile.location === 'string'
+            ? farmProfile.location
+            : farmProfile.location ?? '';
+
+        return {
+            location: locationStr,
+            crop: farmProfile.primary_crop ?? '',
+            crop_stage: farmProfile.crop_stage ?? '',
+            soil: {
+                N: farmProfile.N,
+                P: farmProfile.P,
+                K: farmProfile.K,
+                ph: farmProfile.ph,
+                moisture: farmProfile.moisture_pct,
+                soil_type: farmProfile.soil_type ?? '',
+            },
+            weather: weather
+                ? {
+                      temperature: weather.temperature,
+                      humidity: weather.humidity,
+                      rainfall: weather.rainfall,
+                      condition: weather.condition ?? '',
+                      risk: weather.risk ?? '',
+                  }
+                : undefined,
+            irrigation: irrigationDecision
+                ? {
+                      status_code: irrigationDecision.status_code,
+                      status_label: irrigationDecision.status_label,
+                      reason: irrigationDecision.reason,
+                      action_tip: irrigationDecision.action_tip,
+                  }
+                : undefined,
+        };
+    }, [farmProfile, weather, irrigationDecision]);
 
     // ---------------------------------------------------------
     // SPEECH LANGUAGE CODES
@@ -94,6 +145,27 @@ export const AskAgriNivaraFloating: React.FC<
 
         hi:
             'नमस्ते! मैं एग्रीनिवार AI हूँ। अपनी फसल, मिट्टी NPK, मौसम, बीमारी, सिंचाई, खाद, फसल स्वास्थ्य या उपज बिक्री के बारे में कोई भी सवाल पूछें।',
+    };
+
+    const quickPrompts: Record<Language, Array<{ label: string; query: string }>> = {
+        en: [
+            { label: '🌱 What to grow?', query: 'What crop should I grow based on my soil and weather?' },
+            { label: '💧 Irrigation advice', query: 'Do I need to irrigate my crop today?' },
+            { label: '🍂 Yellow leaves', query: 'Why are my crop leaves turning yellow?' },
+            { label: '🧪 Fertilizer NPK', query: 'What NPK fertilizer dosage do I need?' },
+        ],
+        te: [
+            { label: '🌱 ఏ పంట వేయాలి?', query: 'నా నేల మరియు వాతావరణానికి ఏ పంట అనుకూలం?' },
+            { label: '💧 నీటిపారుదల సలహా', query: 'ఈరోజు పంటకు నీరు పెట్టాలా?' },
+            { label: '🍂 పసుపు ఆకులు', query: 'పంట ఆకులు పసుపు రంగులోకి మారితే ఏం చేయాలి?' },
+            { label: '🧪 ఎరువుల NPK', query: 'పంటకు ఎరువుల మోతాదు ఎంత వేయాలి?' },
+        ],
+        hi: [
+            { label: '🌱 कौन सी फसल लगाएं?', query: 'मेरी मिट्टी और मौसम के लिए कौन सी फसल उपयुक्त है?' },
+            { label: '💧 सिंचाई सलाह', query: 'क्या आज मेरी फसल को सिंचाई की आवश्यकता है?' },
+            { label: '🍂 पीली पत्तियां', query: 'फसल की पत्तियां पीली क्यों हो रही हैं?' },
+            { label: '🧪 खाद NPK सलाह', query: 'फसल के लिए NPK खाद की मात्रा कितनी होनी चाहिए?' },
+        ],
     };
 
     // ---------------------------------------------------------
@@ -511,19 +583,9 @@ export const AskAgriNivaraFloating: React.FC<
                 await askAgriNivaraApi(
                     text,
                     currentLanguage,
-                    {
-                        location:
-                            farmerContext?.location,
-
-                        crop:
-                            farmerContext?.crop,
-
-                        temperature:
-                            farmerContext?.temperature,
-
-                        disease:
-                            farmerContext?.disease,
-                    }
+                    buildChatContext(),
+                    // Send last 10 turns (5 exchanges) for memory
+                    chatHistory.slice(-10)
                 );
 
             console.log(
@@ -552,6 +614,16 @@ export const AskAgriNivaraFloating: React.FC<
                 ...previous,
                 assistantMessage,
             ]);
+
+            // Append to history (keep last 20 turns)
+            setChatHistory((prev) => {
+                const nextHistory: ChatHistoryItem[] = [
+                    ...prev,
+                    { role: 'user', text },
+                    { role: 'assistant', text: botAnswer },
+                ];
+                return nextHistory.slice(-20);
+            });
 
             speakText(
                 botAnswer,
@@ -998,8 +1070,24 @@ export const AskAgriNivaraFloating: React.FC<
                             bg-slate-950
                             border-t
                             border-slate-800/80
+                            space-y-2
                         "
                     >
+                        {/* QUICK ACTION CHIPS */}
+                        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                            {quickPrompts[selectedLang]?.map((qp, idx) => (
+                                <button
+                                    key={idx}
+                                    type="button"
+                                    onClick={() => handleSend(qp.query)}
+                                    disabled={isThinking}
+                                    className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-emerald-950/40 text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold whitespace-nowrap transition cursor-pointer disabled:opacity-50"
+                                >
+                                    {qp.label}
+                                </button>
+                            ))}
+                        </div>
+
                         <div className="flex items-center gap-2">
 
                             {/* INPUT */}

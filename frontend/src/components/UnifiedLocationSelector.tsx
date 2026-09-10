@@ -1,23 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Navigation, Loader2, Search, X } from 'lucide-react';
-import { searchLocationApi } from '../services/api';
-
-export interface LocationSuggestion {
-    place_id?: number | string;
-    lat: string;
-    lon: string;
-    display_name: string;
-    name?: string;
-    type?: string;
-}
+import { searchLocationApi, reverseGeocodeLocationApi } from '../services/api';
+import type { LocationSuggestion, StructuredLocation } from '../types/agriculture';
 
 export interface LocationDetails {
     fullAddress: string;
     city: string;
+    village?: string;
+    district?: string;
     state?: string;
     country?: string;
     lat?: number;
     lon?: number;
+    structured?: StructuredLocation;
 }
 
 interface UnifiedLocationSelectorProps {
@@ -32,7 +27,7 @@ interface UnifiedLocationSelectorProps {
 export const UnifiedLocationSelector: React.FC<UnifiedLocationSelectorProps> = ({
     value,
     onChange,
-    placeholder = 'Search city or location...',
+    placeholder = 'Search farm village, city, or district (e.g. Guntur, Hyderabad)...',
     className = '',
     showGeolocationButton = true,
     inputId = 'location-search-input',
@@ -71,7 +66,7 @@ export const UnifiedLocationSelector: React.FC<UnifiedLocationSelectorProps> = (
             clearTimeout(debounceTimerRef.current);
         }
 
-        if (val.trim().length < 3) {
+        if (val.trim().length < 2) {
             setSuggestions([]);
             setIsOpen(false);
             return;
@@ -89,30 +84,29 @@ export const UnifiedLocationSelector: React.FC<UnifiedLocationSelectorProps> = (
             } finally {
                 setIsSearching(false);
             }
-        }, 350);
+        }, 300);
     };
 
     const handleSelectSuggestion = (suggestion: LocationSuggestion) => {
-        const parts = suggestion.display_name.split(',').map((p: string) => p.trim());
-
-        const city = parts[0] || suggestion.display_name;
-        const state = parts.length > 2 ? parts[parts.length - 2] : parts[1] || '';
-        const country = parts[parts.length - 1] || 'India';
-
+        const structured = suggestion.structured;
         const lat = parseFloat(suggestion.lat);
         const lon = parseFloat(suggestion.lon);
 
         const details: LocationDetails = {
             fullAddress: suggestion.display_name,
-            city,
-            state,
-            country,
+            city: structured?.city || suggestion.name || suggestion.display_name.split(',')[0],
+            village: structured?.village,
+            district: structured?.district,
+            state: structured?.state,
+            country: structured?.country || 'India',
             lat,
             lon,
+            structured,
         };
 
-        setQuery(suggestion.display_name);
-        onChange(suggestion.display_name, details);
+        const targetDisplayName = structured?.display_name || suggestion.display_name;
+        setQuery(targetDisplayName);
+        onChange(targetDisplayName, details);
         setIsOpen(false);
         setSuggestions([]);
     };
@@ -130,53 +124,24 @@ export const UnifiedLocationSelector: React.FC<UnifiedLocationSelectorProps> = (
             async (position) => {
                 const { latitude, longitude } = position.coords;
                 try {
-                    // Use OpenStreetMap Nominatim reverse geocoding to get a human-readable name
-                    const response = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`,
-                        { headers: { 'Accept-Language': 'en' } }
-                    );
+                    const structured = await reverseGeocodeLocationApi(latitude, longitude);
 
-                    if (response.ok) {
-                        const data = await response.json();
-                        const addr = data.address || {};
+                    const displayName = structured.display_name || `${structured.city}, ${structured.state}, India`;
+                    const details: LocationDetails = {
+                        fullAddress: displayName,
+                        city: structured.city,
+                        village: structured.village,
+                        district: structured.district,
+                        state: structured.state,
+                        country: structured.country,
+                        lat: latitude,
+                        lon: longitude,
+                        structured,
+                    };
 
-                        // Build a clean, readable location name (city/town/village, state, country)
-                        const city =
-                            addr.city ||
-                            addr.town ||
-                            addr.village ||
-                            addr.county ||
-                            addr.state_district ||
-                            'Current Location';
-                        const state = addr.state || '';
-                        const country = addr.country || 'India';
-
-                        const displayName = [city, state, country]
-                            .filter(Boolean)
-                            .join(', ');
-
-                        setQuery(displayName);
-                        onChange(displayName, {
-                            fullAddress: data.display_name || displayName,
-                            city,
-                            state,
-                            country,
-                            lat: latitude,
-                            lon: longitude,
-                        });
-                    } else {
-                        // Fallback to coordinates if reverse geocoding fails
-                        const fallbackName = `Lat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}`;
-                        setQuery(fallbackName);
-                        onChange(fallbackName, {
-                            fullAddress: fallbackName,
-                            city: 'Current Location',
-                            lat: latitude,
-                            lon: longitude,
-                        });
-                    }
+                    setQuery(displayName);
+                    onChange(displayName, details);
                 } catch {
-                    // Network error fallback
                     const fallbackName = `Lat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}`;
                     setQuery(fallbackName);
                     onChange(fallbackName, {
@@ -190,7 +155,7 @@ export const UnifiedLocationSelector: React.FC<UnifiedLocationSelectorProps> = (
                 }
             },
             () => {
-                setErrorMsg('Location permission denied or unavailable.');
+                setErrorMsg('Location permission denied or GPS unavailable.');
                 setIsGeolocating(false);
             },
             { timeout: 10000, enableHighAccuracy: true }

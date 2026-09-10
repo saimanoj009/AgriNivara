@@ -5,6 +5,7 @@ import type {
     IrrigationDecision,
     LocationSuggestion,
     SIHJudgeSpecs,
+    StructuredLocation,
     WeatherIntelligence,
     WhatIfResponse
 } from '../types/agriculture';
@@ -117,19 +118,33 @@ export async function predictDiseaseApi(file: File): Promise<any> {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch(`${API_BASE_URL}/predict-disease`, {
-        method: 'POST',
-        body: formData
-    });
+    try {
+        const response = await fetch(`${API_BASE_URL}/predict-disease`, {
+            method: 'POST',
+            body: formData
+        });
 
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-        const detail = typeof data?.detail === 'string'
-            ? data.detail
-            : data?.detail?.message || data?.message;
-        throw new Error(detail || `Disease prediction failed with status ${response.status}`);
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            if (response.status === 404) {
+                throw new Error('Disease diagnosis service endpoint was not found (404). The AI prediction server may be offline or initializing.');
+            } else if (response.status === 503) {
+                throw new Error('Disease diagnosis service is temporarily busy or downloading the deep neural network weights. Please retry in a moment.');
+            } else if (response.status === 413) {
+                throw new Error('The uploaded image file is too large. Please upload an image under 10MB.');
+            }
+            const detail = typeof data?.detail === 'string'
+                ? data.detail
+                : data?.detail?.message || data?.message;
+            throw new Error(detail || `Disease prediction failed with status ${response.status}`);
+        }
+        return data;
+    } catch (err: any) {
+        if (err.message && !err.message.includes('fetch')) {
+            throw err;
+        }
+        throw new Error('Unable to connect to the plant disease diagnostic server. Please check your network connection.');
     }
-    return data;
 }
 
 export async function fetchTechnicalDetailsApi(): Promise<SIHJudgeSpecs> {
@@ -140,14 +155,134 @@ export async function fetchTechnicalDetailsApi(): Promise<SIHJudgeSpecs> {
     return response.json();
 }
 
+export function parseNominatimResult(item: any): StructuredLocation {
+    const addr = item.address || {};
+    const village = addr.village || addr.hamlet || addr.suburb || addr.neighbourhood || '';
+    const city = addr.city || addr.town || addr.municipality || addr.village || addr.state_district || addr.county || item.name || 'Current Location';
+    const district = addr.state_district || addr.district || addr.county || '';
+    const state = addr.state || '';
+    const country = addr.country || 'India';
+
+    const lat = parseFloat(item.lat) || 0;
+    const lon = parseFloat(item.lon) || 0;
+
+    // Build a clean, professional display name
+    const parts = [village || city, district && district !== city ? district : '', state, country].filter(Boolean);
+    const displayName = parts.length > 0 ? Array.from(new Set(parts)).join(', ') : item.display_name;
+
+    return {
+        display_name: displayName,
+        village: village || undefined,
+        city: city || village || 'Unknown City',
+        district: district || undefined,
+        state: state || '',
+        country: country || 'India',
+        latitude: lat,
+        longitude: lon,
+    };
+}
+
 export async function searchLocationApi(query: string): Promise<LocationSuggestion[]> {
-    if (!query || query.length < 3) return [];
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`;
-    const response = await fetch(url, {
-        headers: { 'User-Agent': 'AgriNivara-SIH-App' }
-    });
-    if (!response.ok) return [];
-    return response.json();
+    if (!query || query.trim().length < 2) return [];
+    const cleanQuery = query.trim();
+
+    try {
+        // First priority: Indian results with structured address details
+        const urlIndia = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cleanQuery)}&countrycodes=in&addressdetails=1&limit=8`;
+        const response = await fetch(urlIndia, {
+            headers: {
+                'User-Agent': 'AgriNivara-Agricultural-Decision-Platform/2.0',
+                'Accept-Language': 'en,te,hi',
+            },
+        });
+
+        let data = response.ok ? await response.json() : [];
+
+        // If no results in India and query does not explicitly specify a non-Indian place, try global fallback
+        if (!data || data.length === 0) {
+            const urlGlobal = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cleanQuery)}&addressdetails=1&limit=5`;
+            const globalRes = await fetch(urlGlobal, {
+                headers: {
+                    'User-Agent': 'AgriNivara-Agricultural-Decision-Platform/2.0',
+                    'Accept-Language': 'en',
+                },
+            });
+            data = globalRes.ok ? await globalRes.json() : [];
+        }
+
+        if (!Array.isArray(data)) return [];
+
+        const lowerQ = cleanQuery.toLowerCase();
+
+        // Map and rank results: exact match, Indian results first, place type relevance
+        const mapped: LocationSuggestion[] = data.map((item: any) => {
+            const structured = parseNominatimResult(item);
+            return {
+                place_id: item.place_id || `${item.lat}-${item.lon}`,
+                display_name: structured.display_name,
+                lat: String(item.lat),
+                lon: String(item.lon),
+                name: item.name || structured.city,
+                type: item.type,
+                address: item.address,
+                structured,
+            };
+        });
+
+        // Rank results: exact name match first, city/town matches before administrative boundaries
+        return mapped.sort((a, b) => {
+            const aName = (a.structured?.city || a.name || '').toLowerCase();
+            const bName = (b.structured?.city || b.name || '').toLowerCase();
+
+            const aExact = aName === lowerQ;
+            const bExact = bName === lowerQ;
+            if (aExact && !bExact) return -1;
+            if (!aExact && bExact) return 1;
+
+            const aStarts = aName.startsWith(lowerQ);
+            const bStarts = bName.startsWith(lowerQ);
+            if (aStarts && !bStarts) return -1;
+            if (!aStarts && bStarts) return 1;
+
+            const aIsIndia = (a.structured?.country || '').toLowerCase().includes('india');
+            const bIsIndia = (b.structured?.country || '').toLowerCase().includes('india');
+            if (aIsIndia && !bIsIndia) return -1;
+            if (!aIsIndia && bIsIndia) return 1;
+
+            return 0;
+        });
+    } catch (err) {
+        console.warn('Geocoding search failed:', err);
+        return [];
+    }
+}
+
+export async function reverseGeocodeLocationApi(lat: number, lon: number): Promise<StructuredLocation> {
+    try {
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=14&addressdetails=1`;
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'AgriNivara-Agricultural-Decision-Platform/2.0',
+                'Accept-Language': 'en',
+            },
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return parseNominatimResult(data);
+        }
+    } catch (err) {
+        console.warn('Reverse geocoding error:', err);
+    }
+
+    return {
+        display_name: `Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`,
+        city: 'Current Location',
+        state: '',
+        country: 'India',
+        latitude: lat,
+        longitude: lon,
+    };
 }
 
 export async function fetchRealtimeWeatherApi(lat: number, lon: number): Promise<WeatherIntelligence> {
@@ -454,16 +589,53 @@ export async function resetFarmerPasswordApi(userId: number, newPassword: string
 // ============================================================
 
 export interface ChatContext {
-    location?: string;
+    location?: {
+        city?: string;
+        district?: string;
+        state?: string;
+        country?: string;
+        latitude?: number;
+        longitude?: number;
+        display_name?: string;
+    } | string;
     crop?: string;
-    temperature?: number;
+    crop_stage?: string;
+    soil?: {
+        N?: number;
+        P?: number;
+        K?: number;
+        ph?: number;
+        moisture?: number;
+        soil_type?: string;
+    };
+    weather?: {
+        temperature?: number;
+        humidity?: number;
+        rainfall?: number;
+        condition?: string;
+        risk?: string;
+    };
+    irrigation?: {
+        status_code?: string;
+        status_label?: string;
+        reason?: string;
+        action_tip?: string;
+    };
+    recent_recommendations?: string[];
     disease?: string;
+    risk_alerts?: string[];
+}
+
+export interface ChatHistoryItem {
+    role: 'user' | 'assistant';
+    text: string;
 }
 
 export async function askAgriNivaraApi(
     question: string,
     lang: 'en' | 'te' | 'hi',
-    context?: ChatContext
+    context?: ChatContext,
+    history?: ChatHistoryItem[]
 ): Promise<{ answer: string; source: string }> {
     const token = getAuthToken();
     const r = await fetch(`${API_BASE_URL}/chat`, {
@@ -476,11 +648,14 @@ export async function askAgriNivaraApi(
             question,
             lang,
             context: context || {},
+            history: history || [],
         }),
     });
     const d = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(d.detail || 'Unable to get AI response.');
-    return { answer: d.answer, source: d.source };
+    if (!r.ok) {
+        throw new Error(d.detail || 'Unable to connect to AI assistant.');
+    }
+    return { answer: d.answer || '', source: d.source || 'local' };
 }
 
 // ============================================================
@@ -521,8 +696,8 @@ export async function fetchSensorTelemetryApi(deviceId?: string): Promise<{
 // ============================================================
 
 export async function fetchSatelliteIndicesApi(
-    lat: number = 17.9689,
-    lon: number = 79.5941,
+    lat: number,
+    lon: number,
     crop: string = 'Rice'
 ): Promise<any> {
     const r = await fetch(

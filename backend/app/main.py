@@ -508,9 +508,9 @@ def _db():
         CREATE TABLE IF NOT EXISTS farm_profiles (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER UNIQUE NOT NULL,
-            location TEXT DEFAULT 'Warangal, Telangana',
-            lat REAL DEFAULT 17.9689,
-            lon REAL DEFAULT 79.5941,
+            location TEXT DEFAULT '',
+            lat REAL DEFAULT NULL,
+            lon REAL DEFAULT NULL,
             area_acres REAL DEFAULT 2.5,
             primary_crop TEXT DEFAULT 'Rice (Paddy)',
             crop_stage TEXT DEFAULT 'Vegetative',
@@ -968,6 +968,126 @@ CROP_REQUIREMENTS: Dict[str, Dict[str, Any]] = {
         "humidity": (50.0, 60.0, 55.0),
         "ph": (6.0, 7.5, 6.8),
         "rainfall": (115.0, 200.0, 160.0)
+    },
+
+    "chilli": {
+        "N": (80, 140, 110),
+        "P": (40, 70, 55),
+        "K": (40, 80, 60),
+        "temperature": (20.0, 35.0, 26.0),
+        "humidity": (55.0, 75.0, 65.0),
+        "ph": (6.0, 7.5, 6.5),
+        "rainfall": (60.0, 120.0, 90.0)
+    },
+
+    "groundnut": {
+        "N": (20, 50, 30),
+        "P": (40, 80, 60),
+        "K": (30, 60, 45),
+        "temperature": (22.0, 32.0, 27.0),
+        "humidity": (50.0, 75.0, 65.0),
+        "ph": (5.8, 7.2, 6.5),
+        "rainfall": (50.0, 100.0, 75.0)
+    },
+
+    "tomato": {
+        "N": (80, 150, 115),
+        "P": (50, 90, 70),
+        "K": (50, 100, 75),
+        "temperature": (18.0, 32.0, 24.0),
+        "humidity": (50.0, 80.0, 65.0),
+        "ph": (6.0, 7.0, 6.5),
+        "rainfall": (40.0, 100.0, 70.0)
+    },
+
+    "sunflower": {
+        "N": (50, 90, 70),
+        "P": (60, 90, 75),
+        "K": (30, 60, 45),
+        "temperature": (20.0, 32.0, 26.0),
+        "humidity": (40.0, 70.0, 55.0),
+        "ph": (6.0, 7.8, 6.8),
+        "rainfall": (40.0, 90.0, 65.0)
+    },
+
+    "onion": {
+        "N": (60, 120, 90),
+        "P": (40, 70, 55),
+        "K": (40, 80, 60),
+        "temperature": (15.0, 30.0, 22.0),
+        "humidity": (45.0, 70.0, 60.0),
+        "ph": (5.8, 7.0, 6.5),
+        "rainfall": (35.0, 75.0, 55.0)
+    },
+
+    "turmeric": {
+        "N": (60, 120, 90),
+        "P": (40, 80, 60),
+        "K": (80, 140, 110),
+        "temperature": (20.0, 35.0, 28.0),
+        "humidity": (70.0, 90.0, 80.0),
+        "ph": (5.5, 7.5, 6.5),
+        "rainfall": (100.0, 200.0, 150.0)
+    },
+
+    "soybean": {
+        "N": (20, 50, 35),
+        "P": (60, 90, 75),
+        "K": (30, 60, 45),
+        "temperature": (20.0, 30.0, 25.0),
+        "humidity": (60.0, 80.0, 70.0),
+        "ph": (6.0, 7.5, 6.8),
+        "rainfall": (60.0, 110.0, 85.0)
+    },
+
+    "sugarcane": {
+        "N": (150, 250, 200),
+        "P": (50, 90, 70),
+        "K": (80, 150, 120),
+        "temperature": (20.0, 38.0, 30.0),
+        "humidity": (60.0, 85.0, 75.0),
+        "ph": (6.0, 7.8, 6.8),
+        "rainfall": (100.0, 250.0, 180.0)
+    },
+
+    "mustard": {
+        "N": (60, 100, 80),
+        "P": (30, 60, 45),
+        "K": (20, 40, 30),
+        "temperature": (10.0, 25.0, 18.0),
+        "humidity": (40.0, 70.0, 55.0),
+        "ph": (6.0, 7.5, 6.8),
+        "rainfall": (25.0, 60.0, 40.0)
+    },
+
+    "brinjal": {
+        "N": (80, 140, 100),
+        "P": (40, 80, 60),
+        "K": (40, 70, 55),
+        "temperature": (21.0, 32.0, 26.0),
+        "humidity": (50.0, 75.0, 65.0),
+        "ph": (5.5, 6.8, 6.2),
+        "rainfall": (50.0, 110.0, 80.0)
+    },
+
+    "bajra": {
+        "N": (40, 80, 60),
+        "P": (20, 45, 30),
+        "K": (15, 35, 25),
+        "temperature": (24.0, 36.0, 30.0),
+        "humidity": (30.0, 60.0, 45.0),
+        "ph": (6.5, 8.0, 7.2),
+        "rainfall": (25.0, 60.0, 40.0)
+    },
+
+    "ragi": {
+        "N": (40, 70, 50),
+        "P": (20, 40, 30),
+        "K": (20, 40, 30),
+        "temperature": (18.0, 30.0, 24.0),
+        "humidity": (50.0, 75.0, 65.0),
+        "ph": (5.5, 7.5, 6.5),
+        "rainfall": (50.0, 100.0, 75.0)
     },
 }
 
@@ -1756,6 +1876,56 @@ def generate_action_plan(
         "warning": warnings,
         "next_action": next_action
     }
+
+
+AGRONOMIC_CROPS_LIST = [
+    "chilli", "groundnut", "tomato", "sunflower", "onion", 
+    "turmeric", "soybean", "sugarcane", "mustard", "brinjal",
+    "bajra", "ragi", "cotton", "maize", "rice", "pigeonpeas", "chickpea"
+]
+
+def generate_agronomic_alternatives(
+    data: CropRequest,
+    exclude_crops: Optional[List[str]] = None
+) -> List[Dict[str, Any]]:
+    exclude_set = set(c.lower().replace(" ", "").replace("(", "").replace(")", "").replace("paddy", "") for c in (exclude_crops or []))
+    alternatives = []
+    
+    for crop_key in AGRONOMIC_CROPS_LIST:
+        normalized_key = crop_key.lower().replace(" ", "")
+        if normalized_key in exclude_set:
+            continue
+        
+        reqs = get_crop_requirements(crop_key)
+        if not reqs:
+            continue
+            
+        suit = calculate_suitability_scores(data, crop_key)
+        score = suit.get("overall", 0)
+        
+        # Calculate realistic confidence metric based on overall agronomic fit
+        confidence = round(max(40.0, min(96.0, float(score) * 0.94)), 1)
+        
+        c_risks = generate_risk_analysis(data, crop_key)
+        high_risk_count = sum(1 for r in c_risks if r.get("severity") == "HIGH")
+        risk_rating = "HIGH" if high_risk_count >= 2 else ("MODERATE" if high_risk_count == 1 else "LOW")
+        
+        crop_display = crop_key.capitalize()
+        alternatives.append({
+            "crop": crop_display,
+            "confidence": confidence,
+            "overall_score": score,
+            "source": "agronomic",
+            "badge": "🌱 AGRONOMIC ALTERNATIVE",
+            "soil_fit": f"{suit['soil']}%",
+            "weather_fit": f"{suit['weather']}%",
+            "water_fit": f"{suit['water']}%",
+            "risk_rating": risk_rating
+        })
+    
+    # Sort by overall score descending
+    alternatives.sort(key=lambda x: x["overall_score"], reverse=True)
+    return alternatives
 
 
 # ============================================================
@@ -2587,52 +2757,112 @@ def mark_alert_read(
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
 
-def _call_gemini(question: str, lang: str, context: dict) -> str:
+def _extract_chat_context(context: dict) -> dict:
+    if not isinstance(context, dict):
+        return {}
+    
+    weather = context.get("weather") if isinstance(context.get("weather"), dict) else {}
+    soil = context.get("soil") if isinstance(context.get("soil"), dict) else {}
+    irrigation = context.get("irrigation") if isinstance(context.get("irrigation"), dict) else {}
+    
+    crop = context.get("crop") or context.get("primary_crop") or ""
+    location = context.get("location") or ""
+    temp = weather.get("temperature") if weather.get("temperature") is not None else context.get("temperature", "")
+    humidity = weather.get("humidity") if weather.get("humidity") is not None else context.get("humidity", "")
+    rainfall = weather.get("rainfall") if weather.get("rainfall") is not None else context.get("rainfall", "")
+    weather_cond = weather.get("condition") or context.get("condition") or ""
+    
+    n_val = soil.get("N") if soil.get("N") is not None else context.get("N")
+    p_val = soil.get("P") if soil.get("P") is not None else context.get("P")
+    k_val = soil.get("K") if soil.get("K") is not None else context.get("K")
+    ph_val = soil.get("ph") if soil.get("ph") is not None else context.get("ph")
+    soil_type = soil.get("soil_type") or context.get("soil_type") or ""
+    moisture = soil.get("moisture") if soil.get("moisture") is not None else context.get("moisture_pct")
+    
+    irr_status = irrigation.get("status_label") or (f"{irrigation.get('status_code')}: {irrigation.get('reason')}" if irrigation.get("status_code") else "") or (context.get("irrigation") if isinstance(context.get("irrigation"), str) else "")
+    disease = context.get("disease") or ""
+    crop_stage = context.get("crop_stage") or ""
+    
+    return {
+        "crop": str(crop) if crop else "",
+        "crop_stage": str(crop_stage) if crop_stage else "",
+        "location": str(location) if location else "",
+        "temperature": str(temp) if temp != "" and temp is not None else "",
+        "humidity": str(humidity) if humidity != "" and humidity is not None else "",
+        "rainfall": str(rainfall) if rainfall != "" and rainfall is not None else "",
+        "weather_condition": str(weather_cond) if weather_cond else "",
+        "soil_n": str(n_val) if n_val is not None else "",
+        "soil_p": str(p_val) if p_val is not None else "",
+        "soil_k": str(k_val) if k_val is not None else "",
+        "soil_ph": str(ph_val) if ph_val is not None else "",
+        "soil_type": str(soil_type) if soil_type else "",
+        "soil_moisture": str(moisture) if moisture is not None and moisture != "" else "",
+        "irrigation": str(irr_status) if irr_status else "",
+        "disease": str(disease) if disease else "",
+    }
+
+
+def _call_gemini(question: str, lang: str, raw_context: dict, history: list) -> str:
     """
-    Call Google Gemini 1.5 Flash via REST API to answer agricultural questions.
-    Returns the AI-generated response text, or raises an exception on failure.
+    Call Google Gemini 1.5 Flash via REST API.
+    Supports multi-turn conversation history and rich farm context injection.
     """
-    crop = context.get("crop", "your crop")
-    location = context.get("location", "your farm")
-    temperature = context.get("temperature", "")
-    disease = context.get("disease", "")
+    ctx = _extract_chat_context(raw_context)
 
     lang_instruction = {
-        "te": "Please respond in Telugu (తెలుగు) language only.",
-        "hi": "Please respond in Hindi (हिन्दी) language only.",
-        "en": "Please respond in English."
-    }.get(lang, "Please respond in English.")
+        "te": "Respond ONLY in natural, farmer-friendly Telugu (తెలుగు) script.",
+        "hi": "Respond ONLY in natural, farmer-friendly Hindi (हिन्दी) script.",
+        "en": "Respond in clear, accessible English."
+    }.get(lang, "Respond in English.")
 
     context_parts = []
-    if crop and crop != "your crop":
-        context_parts.append(f"Current crop: {crop}")
-    if location and location != "your farm":
-        context_parts.append(f"Farm location: {location}")
-    if temperature:
-        context_parts.append(f"Temperature: {temperature}°C")
-    if disease:
-        context_parts.append(f"Detected disease: {disease}")
+    if ctx.get("crop"): context_parts.append(f"Current crop: {ctx['crop']}")
+    if ctx.get("crop_stage"): context_parts.append(f"Crop growth stage: {ctx['crop_stage']}")
+    if ctx.get("location"): context_parts.append(f"Farm location: {ctx['location']}")
+    if ctx.get("temperature"): context_parts.append(f"Ambient temperature: {ctx['temperature']}°C")
+    if ctx.get("humidity"): context_parts.append(f"Relative humidity: {ctx['humidity']}%")
+    if ctx.get("rainfall"): context_parts.append(f"Recent/forecast rainfall: {ctx['rainfall']} mm")
+    if ctx.get("soil_type"): context_parts.append(f"Soil type: {ctx['soil_type']}")
+    if ctx.get("soil_n"): context_parts.append(f"Soil NPK: N={ctx['soil_n']}, P={ctx['soil_p']}, K={ctx['soil_k']} mg/kg")
+    if ctx.get("soil_ph"): context_parts.append(f"Soil pH: {ctx['soil_ph']}")
+    if ctx.get("soil_moisture"): context_parts.append(f"Soil moisture: {ctx['soil_moisture']}%")
+    if ctx.get("irrigation"): context_parts.append(f"Irrigation advice: {ctx['irrigation']}")
+    if ctx.get("disease"): context_parts.append(f"Recent foliar pathogen: {ctx['disease']}")
 
-    context_str = ". ".join(context_parts)
+    context_str = "\n".join(f"- {p}" for p in context_parts)
 
-    system_prompt = (
-        "You are AgriNivara AI, an expert agricultural advisor specializing in Indian farming. "
-        "You help farmers with crop disease treatment, irrigation scheduling, fertilizer NPK advice, "
-        "pest management, soil health, weather-based farming decisions, market pricing, and post-harvest storage. "
-        "Give practical, actionable advice. Be concise (2-4 sentences). "
-        "Always prioritize organic/sustainable methods first when possible. "
+    system_text = (
+        "You are AgriNivara AI, an expert agricultural advisor specializing in Indian farming practices, "
+        "ICAR scientific guidelines, and regenerative agronomy. "
+        "You help farmers with crop selection, disease diagnosis & fungal treatments, precision irrigation, "
+        "NPK fertilizer scheduling, pest management, weather risks, mandi market pricing, and post-harvest produce quality. "
+        "Give practical, concise, highly actionable advice tailored specifically to the farmer's farm conditions. "
+        "Prioritize organic and integrated pest management (IPM) methods first. "
         f"{lang_instruction}"
     )
-
-    full_prompt = system_prompt
     if context_str:
-        full_prompt += f"\n\nFarmer context: {context_str}"
-    full_prompt += f"\n\nFarmer question: {question}"
+        system_text += f"\n\nFarmer's real-time farm telemetry & profile:\n{context_str}"
+
+    # Build multi-turn contents array with proper Gemini roles
+    contents = [
+        {"role": "user", "parts": [{"text": system_text + "\n\n(The farmer will now begin asking questions.)"}]},
+        {"role": "model", "parts": [{"text": "Understood! I am AgriNivara AI, ready to assist with tailored agronomic guidance for your farm."}]}
+    ]
+
+    for turn in history:
+        raw_role = str(turn.get("role", "user")).lower()
+        role = "model" if raw_role in ("model", "assistant") else "user"
+        text = str(turn.get("text") or turn.get("content") or "").strip()
+        if text:
+            contents.append({"role": role, "parts": [{"text": text}]})
+
+    # Add the current question as final user turn
+    contents.append({"role": "user", "parts": [{"text": question}]})
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GOOGLE_API_KEY}"
     payload = json.dumps({
-        "contents": [{"parts": [{"text": full_prompt}]}],
-        "generationConfig": {"temperature": 0.7, "maxOutputTokens": 400}
+        "contents": contents,
+        "generationConfig": {"temperature": 0.65, "maxOutputTokens": 600}
     }).encode("utf-8")
 
     req = urllib.request.Request(
@@ -2641,23 +2871,48 @@ def _call_gemini(question: str, lang: str, context: dict) -> str:
         headers={"Content-Type": "application/json"},
         method="POST"
     )
-    with urllib.request.urlopen(req, timeout=15) as resp:
+    with urllib.request.urlopen(req, timeout=20) as resp:
         result = json.loads(resp.read().decode("utf-8"))
         return result["candidates"][0]["content"]["parts"][0]["text"]
 
 
-def _local_agri_answer(question: str, lang: str, context: dict) -> str:
+def _local_agri_answer(question: str, lang: str, raw_context: dict) -> str:
     """
-    Enhanced local keyword-based agricultural knowledge base.
-    Used as fallback when Gemini API is unavailable.
+    Enhanced local keyword and context-based agricultural knowledge base.
+    Used when Gemini API is offline or unconfigured.
     """
     q = question.lower()
-    crop = context.get("crop", "your crop")
-    location = context.get("location", "your farm")
-    temp = f"{context.get('temperature')}°C" if context.get("temperature") else "current conditions"
+    ctx = _extract_chat_context(raw_context)
+    crop = ctx.get("crop") or "your crop"
+    location = ctx.get("location") or "your farm location"
+    temp = f"{ctx['temperature']}°C" if ctx.get("temperature") else "current ambient conditions"
+    soil_n = ctx.get("soil_n") or "90"
+    soil_p = ctx.get("soil_p") or "42"
+    soil_k = ctx.get("soil_k") or "43"
+
+    # Crop Recommendation / What should I grow?
+    if any(k in q for k in ["what should i grow", "recommend crop", "suitable crop", "which crop", "ఏ పంట", "ఎటువంటి పంట", "कौन सी फसल", "क्या उगाएं"]):
+        if lang == "te":
+            return (
+                f"{location} ప్రాంతంలో ప్రస్తుత నేల సారం (N:{soil_n}, P:{soil_p}, K:{soil_k}) మరియు వాతావరణం ({temp}) ఆధారంగా "
+                "వరి (Paddy), పత్తి (Cotton), మొక్కజొన్న (Maize), లేదా మిర్చి (Chilli) అనుకూలమైనవి. "
+                "వివరణాత్మక సిఫారసుల కోసం మన 'AI Crop Suitability' ట్యాబ్‌ని చూడండి."
+            )
+        elif lang == "hi":
+            return (
+                f"{location} में वर्तमान मिट्टी (N:{soil_n}, P:{soil_p}, K:{soil_k}) और मौसम ({temp}) के अनुसार "
+                "धान (Paddy), कपास (Cotton), मक्का (Maize), या मिर्च (Chilli) की खेती उपयुक्त है। "
+                "विस्तृत सिफारिश के लिए हमारे 'AI Crop Suitability' सेक्शन को देखें।"
+            )
+        else:
+            return (
+                f"Based on your soil nutrients (N:{soil_n}, P:{soil_p}, K:{soil_k}) and weather conditions ({temp}) at {location}, "
+                f"top suitable crops include Rice (Paddy), Cotton, Maize, and Chilli. "
+                "Check out our 'AI Crop Suitability' tab for detailed multi-parametric agronomic scoring."
+            )
 
     # Yellow leaves / chlorosis / nutrient deficiency
-    if any(k in q for k in ["yellow", "yellowing", "pale", "chlorosis", "పసుపు", "पीला"]):
+    if any(k in q for k in ["yellow", "yellowing", "pale", "chlorosis", "పసుపు", "పీలా"]):
         if lang == "te":
             return (
                 f"{crop} ఆకులు పసుపు రంగులోకి మారడానికి సాధారణ కారణాలు: నత్రజని లోపం, ఇనుము లోపం, లేదా అతిగా నీరు పెట్టడం. "
@@ -2719,11 +2974,11 @@ def _local_agri_answer(question: str, lang: str, context: dict) -> str:
     # Fertilizer / NPK / soil
     if any(k in q for k in ["fertilizer", "npk", "nitrogen", "phosphorus", "potassium", "urea", "dap", "soil", "ఎరువు", "నత్రజని", "నేల", "खाद", "मिट्टी", "उर्वरक"]):
         if lang == "te":
-            return f"{crop} పంటకు N:P:K = 120:60:60 కిలో/హెక్టార్ సిఫారసు. నత్రజని 3 భాగాలుగా వేయండి: నాటే సమయం, కనుకాలు విచ్చేదాకా, పూత సమయం. DAP నాటే సమయానికి వేయండి."
+            return f"{crop} పంటకు N:P:K = {soil_n}:{soil_p}:{soil_k} కిలో/హెక్టార్ సిఫారసు. నత్రజని 3 భాగాలుగా వేయండి: నాటే సమయం, కనుకాలు విచ్చేదాకా, పూత సమయం. DAP నాటే సమయానికి వేయండి."
         elif lang == "hi":
-            return f"{crop} के लिए N:P:K = 120:60:60 kg/हेक्टेयर अनुशंसित है। नाइट्रोजन को 3 किस्तों में दें। DAP बुआई के समय, यूरिया टिलरिंग और फूल आने पर दें।"
+            return f"{crop} के लिए N:P:K = {soil_n}:{soil_p}:{soil_k} kg/हेक्टेयर अनुशंसित है। नाइट्रोजन को 3 किस्तों में दें। DAP बुआई के समय, यूरिया टिलरिंग और फूल आने पर दें।"
         else:
-            return f"Recommended NPK for {crop}: 120:60:60 kg/hectare. Split nitrogen into 3 applications — at sowing, tillering, and flowering stages. Apply DAP (phosphorus) as basal dose, Potash (MOP) at panicle initiation."
+            return f"Recommended NPK for {crop}: N:{soil_n}, P:{soil_p}, K:{soil_k} kg/hectare. Split nitrogen into 3 applications — basal dose, vegetative stage, and flowering. Apply DAP (phosphorus) at sowing."
 
     # Sell / price / market
     if any(k in q for k in ["sell", "price", "mandi", "market", "ధర", "అమ్మ", "बेच", "दाम", "मंडी"]):
@@ -2736,21 +2991,28 @@ def _local_agri_answer(question: str, lang: str, context: dict) -> str:
 
     # Default contextual response
     if lang == "te":
-        return f"నేను {crop} పంట నిర్వహణ, నేల సారం, నీటి పారుదల, తెగుళ్ళు మరియు మద్దతు ధరల గురించి సహాయం చేయగలను. దయచేసి మీ నిర్దిష్ట ప్రశ్నను వివరంగా అడగండి."
+        return f"నేను {crop} పంట నిర్వహణ, నేల సారం (N:{soil_n}, P:{soil_p}, K:{soil_k}), నీటి పారుదల, తెగుళ్ళు మరియు మద్దతు ధరల గురించి సహాయం చేయగలను. దయచేసి మీ నిర్దిష్ట ప్రశ్నను వివరంగా అడగండి."
     elif lang == "hi":
-        return f"मैं {crop} की खेती, मिट्टी, सिंचाई, कीड़े और उपज बिक्री में मदद कर सकता हूँ। कृपया अपना विशेष सवाल पूछें।"
+        return f"मैं {crop} की खेती, मिट्टी (N:{soil_n}, P:{soil_p}, K:{soil_k}), सिंचाई, कीड़े और उपज बिक्री में मदद कर सकता हूँ। कृपया अपना विशेष सवाल पूछें।"
     else:
         return (
             f"I can help with {crop} crop management at {location} — including disease treatment, irrigation scheduling, "
-            "NPK fertilizer advice, pest control, and market pricing. "
-            "Please describe your specific problem in more detail for a precise recommendation."
+            f"NPK fertilizer advice (current soil: N:{soil_n}, P:{soil_p}, K:{soil_k}), pest control, and market pricing. "
+            "Please describe your specific question in more detail for a tailored recommendation."
         )
+
+
+class ChatHistoryItem(BaseModel):
+    role: str
+    text: Optional[str] = None
+    content: Optional[str] = None
 
 
 class ChatRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=2000)
     lang: str = Field("en", pattern="^(en|te|hi)$")
     context: Dict[str, Any] = Field(default_factory=dict)
+    history: List[Dict[str, str]] = Field(default_factory=list)  # multi-turn memory
 
 
 @app.post("/chat")
@@ -2776,7 +3038,7 @@ async def ask_agrinivara_chat(
 
     if GOOGLE_API_KEY:
         try:
-            answer = _call_gemini(body.question, body.lang, body.context)
+            answer = _call_gemini(body.question, body.lang, body.context, body.history)
             used_ai = True
         except Exception as exc:
             print(f"[chat] Gemini API error: {exc}. Falling back to local engine.")
@@ -3078,8 +3340,8 @@ def get_sensor_telemetry(
 
 @app.get("/api/satellite/indices")
 def get_satellite_indices(
-    lat: float = 17.9689,
-    lon: float = 79.5941,
+    lat: float,
+    lon: float,
     crop: str = "Rice"
 ):
     """
@@ -3186,10 +3448,10 @@ def calculate_farm_economic_roi(req: EconomicROIRequest):
                 "unit": "INR",
                 "origin": "ESTIMATED"
             },
-            "estimated_total_cost": {
+            "estimated_production_cost": {
                 "value": total_cost_est,
                 "unit": "INR",
-                "origin": "USER ENTERED / ICAR INPUT ESTIMATE"
+                "origin": "ESTIMATED"
             },
             "projected_net_return": {
                 "value": net_profit_est,
@@ -3228,9 +3490,9 @@ def calculate_farm_economic_roi(req: EconomicROIRequest):
 # ============================================================
 
 class FarmProfileSyncRequest(BaseModel):
-    location: str = Field(default="Warangal, Telangana")
-    lat: float = Field(default=17.9689)
-    lon: float = Field(default=79.5941)
+    location: str = Field(default="")
+    lat: Optional[float] = Field(default=None)
+    lon: Optional[float] = Field(default=None)
     area_acres: float = Field(default=2.5)
     primary_crop: str = Field(default="Rice (Paddy)")
     crop_stage: str = Field(default="Vegetative")
@@ -3472,7 +3734,7 @@ def predict_crop(
 
             top_indices = np.argsort(
                 probs
-            )[::-1][:3]
+            )[::-1][:10]
 
             for idx in top_indices:
 
@@ -3596,7 +3858,7 @@ def farm_analysis(
 
             top_indices = np.argsort(
                 probs
-            )[::-1][:3]
+            )[::-1][:10]
 
             for idx in top_indices:
 
@@ -3679,75 +3941,52 @@ def farm_analysis(
             )
         )
 
-        alternative_analysis = []
+        # Generate ML predictions list
+        ml_predictions = []
+        seen_crops = set()
 
         for item in top_predictions:
-
             c_name = item["crop"]
+            normalized_c = c_name.lower().replace(" ", "")
+            seen_crops.add(normalized_c)
 
-            c_suit = (
-                calculate_suitability_scores(
-                    data,
-                    c_name
-                )
-            )
+            c_suit = calculate_suitability_scores(data, c_name)
+            c_risks = generate_risk_analysis(data, c_name)
+            high_risk_count = sum(1 for r in c_risks if r.get("severity") == "HIGH")
+            risk_rating = "HIGH" if high_risk_count >= 2 else ("MODERATE" if high_risk_count == 1 else "LOW")
 
-            c_risks = (
-                generate_risk_analysis(
-                    data,
-                    c_name
-                )
-            )
-
-            high_risk_count = sum(
-                1
-                for r in c_risks
-                if r["severity"] == "HIGH"
-            )
-
-            risk_rating = (
-                "HIGH"
-                if high_risk_count >= 2
-                else (
-                    "MODERATE"
-                    if high_risk_count == 1
-                    else "LOW"
-                )
-            )
-
-            alternative_analysis.append(
+            ml_predictions.append(
                 {
-                    "crop": c_name,
-                    "confidence":
-                        item["confidence"],
-                    "soil_fit":
-                        f"{c_suit['soil']}%",
-                    "weather_fit":
-                        f"{c_suit['weather']}%",
-                    "water_fit":
-                        f"{c_suit['water']}%",
-                    "risk_rating":
-                        risk_rating
+                    "crop": c_name.capitalize(),
+                    "confidence": item["confidence"],
+                    "source": "ml",
+                    "badge": "🤖 AI MODEL RECOMMENDATION",
+                    "soil_fit": f"{c_suit['soil']}%",
+                    "weather_fit": f"{c_suit['weather']}%",
+                    "water_fit": f"{c_suit['water']}%",
+                    "risk_rating": risk_rating
                 }
             )
+
+        # Generate Agronomic Alternatives based on Indian soil and climate rules
+        agronomic_alternatives = generate_agronomic_alternatives(data, exclude_crops=list(seen_crops))
+
+        # Comprehensive 8-10 crop list blending ML candidates with agronomic alternatives
+        alternative_analysis = ml_predictions[:4] + agronomic_alternatives[:6]
 
         return {
             "success": True,
             "recommended_crop": rec_crop,
             "target_crop": target_crop,
             "confidence": confidence,
-            "top_predictions":
-                top_predictions,
-            "explainability":
-                explainability,
-            "suitability_scores":
-                suitability,
-            "risk_analysis":
-                risks,
-            "action_plan":
-                action_plan,
-            "alternative_analysis":
-                alternative_analysis,
+            "top_predictions": top_predictions,
+            "ml_predictions": ml_predictions,
+            "agronomic_alternatives": agronomic_alternatives,
+            "explainability": explainability,
+            "suitability_scores": suitability,
+            "risk_analysis": risks,
+            "action_plan": action_plan,
+            "alternative_analysis": alternative_analysis,
             "soil_intelligence": {
                 "N": n_level,
                 "P": p_level,
@@ -3925,21 +4164,56 @@ def what_if_simulation(
         )
 
 
-# Basic farmer-facing guidance for the classes produced by the model.
-# This is decision support only; severe cases should be confirmed by an agronomist.
+# Import structured disease guidance from disease/predict.py
+try:
+    try:
+        from backend.disease.predict import get_disease_guidance as _get_disease_guidance, DISEASE_DETAILS as _DISEASE_DETAILS
+    except ImportError:
+        try:
+            from disease.predict import get_disease_guidance as _get_disease_guidance, DISEASE_DETAILS as _DISEASE_DETAILS
+        except ImportError:
+            from ..disease.predict import get_disease_guidance as _get_disease_guidance, DISEASE_DETAILS as _DISEASE_DETAILS
+
+    def _build_disease_response(predicted_class: str, confidence: float) -> dict:
+        """Build structured farmer-friendly disease response."""
+        details = _get_disease_guidance(predicted_class)
+        is_healthy = "healthy" in predicted_class.lower()
+        is_low_confidence = confidence < 60.0
+        return {
+            "title": details.get("title", predicted_class.replace("___", " - ").replace("_", " ")),
+            "crop": details.get("crop", predicted_class.split("___")[0].replace("_", " ")),
+            "meaning": details.get("meaning", ""),
+            "possible_causes": details.get("possible_causes", ""),
+            "treatment": details.get("treatment", ""),
+            "prevention": details.get("prevention", ""),
+            "is_healthy": is_healthy,
+            "low_confidence": is_low_confidence,
+            "confidence_note": (
+                "Low-confidence diagnosis. Please upload a clearer image for a more reliable result."
+                if is_low_confidence else ""
+            ),
+        }
+
+except Exception as _import_err:
+    print(f"[WARN] Could not import disease guidance module: {_import_err}. Using fallback.")
+    _DISEASE_DETAILS = {}
+    def _build_disease_response(predicted_class: str, confidence: float) -> dict:
+        is_healthy = "healthy" in predicted_class.lower()
+        return {
+            "title": predicted_class.replace("___", " - ").replace("_", " "),
+            "crop": predicted_class.split("___")[0].replace("_", " "),
+            "meaning": "",
+            "possible_causes": "",
+            "treatment": "Consult your local agricultural extension officer for specific treatment advice.",
+            "prevention": "Maintain field sanitation, good airflow, balanced irrigation, and regular scouting.",
+            "is_healthy": is_healthy,
+            "low_confidence": confidence < 60.0,
+            "confidence_note": "Low-confidence diagnosis. Please upload a clearer image." if confidence < 60.0 else "",
+        }
+
+# Legacy inline DISEASE_GUIDANCE for backward compatibility
 DISEASE_GUIDANCE = {
     "healthy": {"treatment": "No disease pattern detected. Continue balanced irrigation, nutrition, and regular scouting.", "prevention": "Keep foliage dry when possible, remove fallen leaves, and monitor weekly."},
-    "Apple___Apple_scab": {"treatment": "Remove infected leaves and fruit; improve airflow and follow a locally approved fungicide schedule.", "prevention": "Prune for airflow and remove fallen infected leaves."},
-    "Apple___Black_rot": {"treatment": "Remove mummified fruit and infected tissue; use a locally approved fungicide if advised.", "prevention": "Sanitize pruning tools and avoid leaving dead fruit on the tree."},
-    "Apple___Cedar_apple_rust": {"treatment": "Remove badly affected tissue and use a locally approved fungicide when appropriate.", "prevention": "Reduce nearby alternate hosts where practical and maintain good airflow."},
-    "Tomato___Early_blight": {"treatment": "Remove lower infected leaves, avoid overhead irrigation, and use an approved fungicide when needed.", "prevention": "Rotate crops, mulch soil, and keep foliage dry."},
-    "Tomato___Late_blight": {"treatment": "Remove severely infected material quickly and seek local extension guidance for an approved fungicide.", "prevention": "Improve airflow, avoid prolonged leaf wetness, and scout frequently."},
-    "Tomato___Bacterial_spot": {"treatment": "Remove heavily infected leaves and avoid handling wet plants; use only locally approved bactericides if recommended.", "prevention": "Use clean seed/transplants and sanitize tools."},
-    "Potato___Early_blight": {"treatment": "Remove infected foliage and improve airflow; use a locally approved fungicide if advised.", "prevention": "Rotate crops and avoid prolonged leaf wetness."},
-    "Potato___Late_blight": {"treatment": "Remove infected material and obtain local disease-control guidance promptly.", "prevention": "Use healthy planting material and scout during cool, wet conditions."},
-    "Corn_(maize)___Common_rust_": {"treatment": "Scout surrounding plants and use a locally recommended fungicide only when disease pressure warrants it.", "prevention": "Use resistant varieties where available and maintain balanced nutrition."},
-    "Grape___Black_rot": {"treatment": "Remove infected berries and leaves; improve canopy airflow and follow local fungicide guidance.", "prevention": "Sanitize vineyard debris and improve canopy ventilation."},
-    "Squash___Powdery_mildew": {"treatment": "Remove heavily affected leaves and improve airflow; use an approved fungicide if necessary.", "prevention": "Avoid overcrowding and maintain good sunlight and airflow."},
 }
 
 
@@ -4154,12 +4428,12 @@ async def predict_disease(
             predicted_class = f"class_{predicted_idx}"
 
         # ----------------------------------------------------
-        # TOP 3 PREDICTIONS
+        # TOP 5 PREDICTIONS (expanded from 3)
         # ----------------------------------------------------
 
         top_indices = np.argsort(
             predictions
-        )[::-1][:min(3, len(predictions))]
+        )[::-1][:min(5, len(predictions))]
 
         top_predictions = []
 
@@ -4183,22 +4457,15 @@ async def predict_disease(
         print(f"Confidence: {confidence:.2f}%")
         print("=" * 70)
 
-        guidance = DISEASE_GUIDANCE.get(predicted_class)
-        if guidance is None:
-            crop_name = predicted_class.split("___", 1)[0].replace("_", " ")
-            if predicted_class.endswith("___healthy"):
-                guidance = DISEASE_GUIDANCE["healthy"]
-            else:
-                guidance = {
-                    "treatment": "Isolate affected plants where practical, remove severely affected leaves, and confirm the diagnosis with a local agriculture expert before applying chemicals.",
-                    "prevention": "Maintain field sanitation, good airflow, balanced irrigation, and regular scouting."
-                }
+        # Build structured farmer-friendly guidance
+        guidance = _build_disease_response(predicted_class, confidence)
 
         return {
             "success": True,
             "filename": file.filename,
             "predicted_disease": predicted_class,
             "confidence": round(confidence, 2),
+            "low_confidence": confidence < 60.0,
             "top_predictions": top_predictions,
             "guidance": guidance,
             "model_status": disease_model_loader.info()

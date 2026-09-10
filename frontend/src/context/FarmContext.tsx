@@ -21,9 +21,9 @@ interface FarmContextType {
 const STORAGE_KEY = 'agrinivara_farm_context';
 
 const DEFAULT_PROFILE: FarmProfile = {
-  location: 'Warangal, Telangana',
-  lat: 17.9689,
-  lon: 79.5941,
+  location: '',
+  lat: undefined,
+  lon: undefined,
   area_acres: 2.5,
   primary_crop: 'Rice (Paddy)',
   crop_stage: 'Vegetative',
@@ -262,12 +262,16 @@ export const FarmContextProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [weatherError, setWeatherError] = useState<string>('');
 
   const refreshWeather = useCallback(async () => {
-    const lat = farmProfile.lat ?? 17.9689;
-    const lon = farmProfile.lon ?? 79.5941;
+    if (farmProfile.lat === undefined || farmProfile.lon === undefined) {
+      setLoadingWeather(false);
+      setWeatherError('Please select or search your farm location to fetch live satellite weather.');
+      return;
+    }
+
     setLoadingWeather(true);
     setWeatherError('');
     try {
-      const wData = await fetchRealtimeWeatherApi(lat, lon);
+      const wData = await fetchRealtimeWeatherApi(farmProfile.lat, farmProfile.lon);
       setWeather(wData);
     } catch (err: any) {
       console.warn('Weather sync error in FarmContext:', err);
